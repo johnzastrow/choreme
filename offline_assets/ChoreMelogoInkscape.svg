@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="8.5in"
+   height="11in"
+   viewBox="0 0 816 1056"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.1.1 (3bf5ae0d25, 2021-09-20)"
+   sodipodi:docname="ChoreMelogoInkscape.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="in"
+     showgrid="true"
+     inkscape:zoom="1.6534091"
+     inkscape:cx="168.74227"
+     inkscape:cy="528.3024"
+     inkscape:window-width="2560"
+     inkscape:window-height="1377"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1">
+    <inkscape:grid
+       type="xygrid"
+       id="grid1069" />
+  </sodipodi:namedview>
+  <defs
+     id="defs2">
+    <rect
+       x="215.31271"
+       y="194.74914"
+       width="206.84536"
+       height="125.80069"
+       id="rect4242" />
+    <clipPath
+       id="clip0">
+      <rect
+         x="181"
+         y="222"
+         width="405"
+         height="403"
+         id="rect9" />
+    </clipPath>
+    <clipPath
+       id="clip0-9">
+      <rect
+         x="125"
+         y="104"
+         width="71"
+         height="72"
+         id="rect14228" />
+    </clipPath>
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       id="path14233"
+       style="stroke-width:3.65445;fill:#a9d18e;fill-opacity:1"
+       d="M 414.7832 346.24023 C 343.13409 346.24023 285.05078 405.14304 285.05078 477.80078 C 285.05078 550.45852 343.13409 609.36133 414.7832 609.36133 C 460.33733 609.36133 500.38012 585.53123 523.52539 549.51367 L 495.70703 528.50391 C 478.93896 555.96502 448.97414 574.26758 414.7832 574.26758 C 362.24685 574.26758 319.6543 531.07898 319.6543 477.80078 C 319.6543 424.52258 362.24685 381.33398 414.7832 381.33398 C 440.30872 381.33398 463.46855 391.54842 480.55469 408.14258 L 508.97266 387.38672 C 485.32695 362.06341 451.88785 346.24023 414.7832 346.24023 z " />
+    <path
+       d="m 360.20919,411.32954 h 30.73757 l 24.17417,62.37047 25.56652,-62.37047 h 31.00069 l 18.03835,116.94233 H 458.6381 l -8.83645,-67.33686 -28.86649,67.33686 h -12.33742 l -27.55454,-67.33686 -10.1484,67.33686 h -31.00069 z"
+       stroke="#2f528f"
+       stroke-width="4.87259"
+       stroke-miterlimit="8"
+       fill="#2f5597"
+       fill-rule="evenodd"
+       id="path14235" />
+  </g>
+</svg>
