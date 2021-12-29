@@ -1,0 +1,1 @@
+export {ChoreMeAvatar} from './ChoreMeAvatar';
