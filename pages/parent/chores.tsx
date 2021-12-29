@@ -16,24 +16,24 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { v4 as uuidv4 } from "uuid";
-import { GetStaticProps, InferGetStaticPropsType, NextPage } from "next";
+import { GetServerSideProps, NextPage } from "next";
+import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
+import { v4 as uuidv4 } from "uuid";
 import NormalButton from "../../components/button/NormalButton";
 import { ChoreLayout } from "../../components/layout";
 import NormalTextInput from "../../components/text-input/normal-text-input";
-import dbConnect from "../../lib/db";
-import { Chore, User } from "../../models";
-import { ChoreStatus, MongoDocument, Role } from "../../types";
-import { Recurrence } from "../../types/Recurrence";
-import { ChoreVM, UserVM } from "../../types/vm";
+import { useToast } from "../../hooks";
 import {
   useCreateChoreMutation,
   useDeleteChoreMutation,
   useUpdateChoreMutation,
 } from "../../lib/api";
-import { useToast } from "../../hooks";
-import { useRouter } from "next/router";
+import dbConnect from "../../lib/db";
+import { Chore, User } from "../../models";
+import { ChoreStatus, MongoDocument, Role } from "../../types";
+import { Recurrence } from "../../types/Recurrence";
+import { ChoreVM, UserVM } from "../../types/vm";
 
 const filter = createFilterOptions<ChoreVM>();
 
@@ -46,10 +46,7 @@ const initialState = {
   recurrence: Recurrence.None,
   status: ChoreStatus.UNFINISHED,
 };
-const Chores: NextPage<StaticProps> = ({
-  users,
-  chores,
-}: InferGetStaticPropsType<typeof getStaticProps>) => {
+const Chores: NextPage<StaticProps> = ({ users, chores }) => {
   const router = useRouter();
   const { id } = router.query;
 
@@ -358,7 +355,9 @@ type StaticProps = {
   chores: MongoDocument<ChoreVM>[];
 };
 
-export const getStaticProps: GetStaticProps<StaticProps> = async (context) => {
+export const getServerSideProps: GetServerSideProps<StaticProps> = async (
+  context
+) => {
   await dbConnect();
   //Check existing
   const users = (await User.find({ role: { $eq: Role.CHILDREN } }).exec()).map(

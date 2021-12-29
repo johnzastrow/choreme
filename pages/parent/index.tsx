@@ -1,6 +1,6 @@
 import { Typography } from "@mui/material";
 import { styled } from "@mui/system";
-import type { GetStaticProps, NextPage } from "next";
+import type { GetServerSideProps, NextPage } from "next";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { ChoreMeAvatar } from "../../components/avatar";
@@ -101,7 +101,9 @@ type StaticProps = {
   chores: MongoDocument<ChoreVM>[];
 };
 
-export const getStaticProps: GetStaticProps<StaticProps> = async (context) => {
+export const getServerSideProps: GetServerSideProps<StaticProps> = async (
+  context
+) => {
   await dbConnect();
   //Check existing
   const users = (await User.find({ role: { $eq: Role.CHILDREN } }).exec()).map(
