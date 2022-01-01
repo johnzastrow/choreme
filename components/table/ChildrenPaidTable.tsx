@@ -6,6 +6,7 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import React from "react";
+import { formatDate } from "../../lib/date";
 import { MongoDocument } from "../../types/MongoDocument";
 import { ChoreVM } from "../../types/vm/ChoreVM";
 
@@ -19,11 +20,6 @@ export function ChildrenPaidTable({ chores }: ChildrenPaidTableProps) {
     rewardDate: chore.paidDate ? new Date(chore.paidDate) : new Date(),
     amount: chore.points,
   }));
-  const dateOptions: Intl.DateTimeFormatOptions = {
-    weekday: "long",
-    year: "numeric",
-    month: "numeric",
-  };
 
   return (
     <TableContainer component={Paper}>
@@ -41,7 +37,7 @@ export function ChildrenPaidTable({ chores }: ChildrenPaidTableProps) {
               sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
             >
               <TableCell align="left">
-                {row.rewardDate?.toLocaleDateString("en-US", dateOptions)}
+                {formatDate(row.rewardDate)}
               </TableCell>
               <TableCell align="right">{row.amount}</TableCell>
             </TableRow>
