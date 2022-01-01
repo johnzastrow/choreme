@@ -9,8 +9,10 @@ import {
   Typography,
 } from "@mui/material";
 import { NextPage, GetServerSideProps } from "next";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import React from "react";
+import { ChoreMeAvatar } from "../../components/avatar";
 import { NormalButton } from "../../components/button";
 import { ChoreLayout } from "../../components/layout";
 import { RewardsTable } from "../../components/table";
@@ -31,6 +33,7 @@ const Rewards: NextPage<StaticProps> = ({ users, chores }) => {
   const [updateChore, { isLoading: isUpdating }] = useUpdateChoreMutation();
   const [addPoints, { isLoading: isAdding }] = useAddPointsMutation();
   const router = useRouter();
+  const session = useSession();
   const { showToast } = useToast();
   const [state, setState] = React.useState<State>({
     displayingChores: chores,
@@ -85,7 +88,10 @@ const Rewards: NextPage<StaticProps> = ({ users, chores }) => {
   };
 
   return (
-    <ChoreLayout isLoading={isUpdating}>
+    <ChoreLayout
+      isLoading={isUpdating}
+      avatar={<ChoreMeAvatar name={session.data?.user?.name ?? "Unknow"} />}
+    >
       <Stack direction={"row"}>
         <Container>
           <FormControl variant="standard" sx={{ m: 1, minWidth: 120, flex: 1 }}>

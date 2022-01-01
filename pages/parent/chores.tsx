@@ -1,6 +1,5 @@
 import { MobileDatePicker } from "@mui/lab";
 import DateAdapter from "@mui/lab/AdapterMoment";
-import DateTimePicker from "@mui/lab/DateTimePicker";
 import LocalizationProvider from "@mui/lab/LocalizationProvider";
 import {
   Autocomplete,
@@ -18,9 +17,11 @@ import {
   Typography,
 } from "@mui/material";
 import { GetServerSideProps, NextPage } from "next";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
+import { ChoreMeAvatar } from "../../components/avatar";
 import NormalButton from "../../components/button/NormalButton";
 import { ChoreLayout } from "../../components/layout";
 import NormalTextInput from "../../components/text-input/normal-text-input";
@@ -49,6 +50,7 @@ const initialState = {
 };
 const Chores: NextPage<StaticProps> = ({ users, chores }) => {
   const router = useRouter();
+  const session = useSession();
   const { id } = router.query;
 
   // Queries
@@ -125,6 +127,7 @@ const Chores: NextPage<StaticProps> = ({ users, chores }) => {
     <ChoreLayout
       title={"Chores"}
       isLoading={isLoading || isUpdating || isDeleting}
+      avatar={<ChoreMeAvatar name={session.data?.user?.name ?? "Unknow"} />}
     >
       <Stack spacing={2}>
         <Autocomplete
