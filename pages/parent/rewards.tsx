@@ -8,7 +8,7 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { GetStaticProps, NextPage } from "next";
+import { NextPage, GetServerSideProps } from "next";
 import { useRouter } from "next/router";
 import React from "react";
 import { NormalButton } from "../../components/button";
@@ -175,7 +175,9 @@ type StaticProps = {
   chores: MongoDocument<ChoreVM>[];
 };
 
-export const getStaticProps: GetStaticProps<StaticProps> = async (context) => {
+export const getServerSideProps: GetServerSideProps<StaticProps> = async (
+  context
+) => {
   await dbConnect();
   //Check existing
   const users = (await User.find({ role: { $eq: Role.CHILDREN } }).exec()).map(
