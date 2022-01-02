@@ -1,6 +1,6 @@
 import Chip from "@mui/material/Chip";
-import Stack from "@mui/material/Stack";
 import Paper from "@mui/material/Paper";
+import Stack from "@mui/material/Stack";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -8,9 +8,9 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import React from "react";
+import { formatDate } from "../../lib/date";
 import { MongoDocument } from "../../types/MongoDocument";
 import { ChoreVM } from "../../types/vm";
-import { ChoreMeAvatar } from "../avatar";
 import { TextButton } from "../button";
 
 export type AssignedChoreTableProps = {
@@ -22,16 +22,11 @@ export function ChildrenAssignedChoreTable({
   chores,
   choreFinisher,
 }: AssignedChoreTableProps) {
-  const dateOptions: Intl.DateTimeFormatOptions = {
-    weekday: "short",
-    year: "numeric",
-    month: "numeric",
-  };
   const rows = chores.map((chore) => ({
     id: chore._id,
     startDate: chore.startDate
-      ? new Date(chore.startDate).toLocaleDateString("en-US", dateOptions)
-      : new Date().toLocaleDateString("en-US", dateOptions),
+      ? formatDate(new Date(chore.startDate))
+      : formatDate(new Date()),
     chore: chore.name,
     status: chore.status,
     paid: chore.paidDate !== undefined,
