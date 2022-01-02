@@ -5,7 +5,7 @@ import { Provider } from "react-redux";
 import { Toast } from "../components/toast";
 import { store } from "../store";
 import "../styles/globals.css";
-import {CssBaseline} from "@mui/material";
+import { CssBaseline } from "@mui/material";
 
 function MyApp({ Component, pageProps }: AppProps) {
   React.useEffect(() => {
@@ -14,6 +14,7 @@ function MyApp({ Component, pageProps }: AppProps) {
     if (jssStyles) {
       jssStyles.parentElement?.removeChild(jssStyles);
     }
+    console.log(`App Version: ${process.env.NEXT_PUBLIC_APP_VERSION}`);
   }, []);
   return (
     <SessionProvider session={pageProps.session}>

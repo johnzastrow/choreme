@@ -1,4 +1,3 @@
-import { Router } from "@mui/icons-material";
 import {
   Container,
   FormControl,
@@ -8,7 +7,7 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { NextPage, GetServerSideProps } from "next";
+import { GetServerSideProps, NextPage } from "next";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import React from "react";
@@ -23,7 +22,6 @@ import dbConnect from "../../lib/db";
 import { Chore, User } from "../../models";
 import { MongoDocument, Role } from "../../types";
 import { ChoreVM, UserVM } from "../../types/vm";
-import Breadcrumbs from "nextjs-breadcrumbs";
 
 type State = {
   selectedChild?: string;
