@@ -1,3 +1,4 @@
+import { MobileDatePicker } from "@mui/lab";
 import DateAdapter from "@mui/lab/AdapterMoment";
 import DateTimePicker from "@mui/lab/DateTimePicker";
 import LocalizationProvider from "@mui/lab/LocalizationProvider";
@@ -259,7 +260,7 @@ const Chores: NextPage<StaticProps> = ({ users, chores }) => {
         <Stack>
           <LocalizationProvider dateAdapter={DateAdapter}>
             {" "}
-            <DateTimePicker
+            <MobileDatePicker
               renderInput={(props) => <TextField {...props} />}
               label="Start Date"
               value={state.startDate}
