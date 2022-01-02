@@ -23,6 +23,7 @@ import dbConnect from "../../lib/db";
 import { Chore, User } from "../../models";
 import { MongoDocument, Role } from "../../types";
 import { ChoreVM, UserVM } from "../../types/vm";
+import Breadcrumbs from "nextjs-breadcrumbs";
 
 type State = {
   selectedChild?: string;
@@ -91,6 +92,7 @@ const Rewards: NextPage<StaticProps> = ({ users, chores }) => {
     <ChoreLayout
       isLoading={isUpdating}
       avatar={<ChoreMeAvatar name={session.data?.user?.name ?? "Unknow"} />}
+      title="Rewards"
     >
       <Stack direction={"row"}>
         <Container>

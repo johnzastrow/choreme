@@ -54,6 +54,7 @@ const AssignedChores: NextPage<StaticProps> = ({ users, chores }) => {
   return (
     <ChoreLayout
       avatar={<ChoreMeAvatar name={session.data?.user?.name ?? "Unknow"} />}
+      title="Assigned Chores"
     >
       <ChoreNavigation
         onNext={() => handleDateChange(1)}
