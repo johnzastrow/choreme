@@ -125,7 +125,7 @@ const Chores: NextPage<StaticProps> = ({ users, chores }) => {
 
   return (
     <ChoreLayout
-      title={"Chores"}
+      title={"Chore"}
       isLoading={isLoading || isUpdating || isDeleting}
       avatar={<ChoreMeAvatar name={session.data?.user?.name ?? "Unknow"} />}
     >
