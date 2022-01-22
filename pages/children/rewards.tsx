@@ -1,35 +1,23 @@
-import {
-  Container,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  Stack,
-  Typography,
-} from "@mui/material";
+import { Container, Stack, Typography } from "@mui/material";
 import { GetServerSideProps, NextPage } from "next";
 import { getSession, useSession } from "next-auth/react";
 import Link from "next/link";
-import { useRouter } from "next/router";
 import React from "react";
 import { ChoreMeAvatar } from "../../components/avatar/ChoreMeAvatar";
 import { NormalButton } from "../../components/button";
 import { ChoreLayout } from "../../components/layout";
 import { ChildrenPaidTable } from "../../components/table/ChildrenPaidTable";
 import dbConnect from "../../lib/db";
-import { Chore, User } from "../../models";
+import { getUserOwed, getTaskChore } from "../../lib/task.service";
+import { groupBy } from "../../lib/utils";
+import { Chore, IChore, User } from "../../models";
+import Task, { ITask } from "../../models/task.model";
 import { MongoDocument } from "../../types";
-import { ChoreVM } from "../../types/vm";
+import { TaskStatus } from "../../types/enum";
+import { TaskChoreVM } from "../../types/vm";
 
-const Rewards: NextPage<StaticProps> = ({ chores }) => {
+const Rewards: NextPage<StaticProps> = ({ groupedChores, owedPoints }) => {
   const session = useSession();
-
-  let points = 0;
-  chores.forEach((chore) => {
-    if (chore.paidDate === undefined) {
-      points += chore.points;
-    }
-  });
 
   return (
     <ChoreLayout
@@ -39,12 +27,10 @@ const Rewards: NextPage<StaticProps> = ({ chores }) => {
     >
       <Stack direction={"row"}>
         <Container>
-          <Typography variant="h5">Owned: {points}</Typography>
+          <Typography variant="h5">Owed: {owedPoints}</Typography>
         </Container>
       </Stack>
-      <ChildrenPaidTable
-        chores={chores.filter((chore) => chore.paidDate !== undefined)}
-      />
+      <ChildrenPaidTable chores={groupedChores} />
       <Stack flexDirection={"row"}>
         <Link href="/children">
           <NormalButton variant="contained" color="primary" sx={{ flex: 1 }}>
@@ -59,7 +45,8 @@ const Rewards: NextPage<StaticProps> = ({ chores }) => {
 export default Rewards;
 
 type StaticProps = {
-  chores: MongoDocument<ChoreVM>[];
+  groupedChores: { [key: string]: TaskChoreVM[] };
+  owedPoints: number;
 };
 
 export const getServerSideProps: GetServerSideProps<StaticProps> = async (
@@ -69,22 +56,35 @@ export const getServerSideProps: GetServerSideProps<StaticProps> = async (
 
   const session = await getSession({ req: context.req });
 
-  let _chores = [];
+  let chores: { [key: string]: TaskChoreVM[] } = {};
+  let owedPoints = 0;
   if (session) {
     const user = await User.findOne({ email: session.user?.email }).exec();
     if (user) {
-      _chores = (
-        await Chore.find({
-          assignedTo: user._id,
-        }).exec()
-      ).map((doc) =>
-        JSON.parse(JSON.stringify(doc.toJSON<MongoDocument<ChoreVM>>()))
-      );
+      Object.entries(
+        groupBy<MongoDocument<ITask>>(
+          (
+            await Task.find({
+              owner: user._id,
+              status: TaskStatus.Finished,
+              paidDate: { $exists: true },
+            }).exec()
+          ).map((doc) =>
+            JSON.parse(JSON.stringify(doc.toJSON<MongoDocument<ITask>>()))
+          ),
+          "paidDate"
+        )
+      ).forEach(async ([key, tasks]) => {
+        chores[key] = await getTaskChore(tasks);
+      });
+
+      owedPoints = await getUserOwed(user._id);
     }
   }
   return {
     props: {
-      chores: _chores,
+      groupedChores: chores,
+      owedPoints,
     },
   };
 };

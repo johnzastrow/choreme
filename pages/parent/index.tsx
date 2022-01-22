@@ -1,18 +1,16 @@
-import { Typography } from "@mui/material";
-import { styled } from "@mui/system";
-import type { GetServerSideProps, NextPage } from "next";
-import { useSession } from "next-auth/react";
-import Head from "next/head";
-import { useRouter } from "next/router";
-import { ChoreMeAvatar } from "../../components/avatar";
-import { NormalButton } from "../../components/button";
-import { ChoreLayout } from "../../components/layout/ChoreLayout";
-import { ChoreMeTable } from "../../components/table";
+import {Typography} from "@mui/material";
+import {styled} from "@mui/system";
+import type {GetServerSideProps, NextPage} from "next";
+import {useSession} from "next-auth/react";
+import {useRouter} from "next/router";
+import {ChoreMeAvatar} from "../../components/avatar";
+import {NormalButton} from "../../components/button";
+import {ChoreLayout} from "../../components/layout";
+import {ChoreMeTable} from "../../components/table";
 import dbConnect from "../../lib/db";
-import { Chore, User } from "../../models";
-import styles from "../../styles/Home.module.css";
-import { MongoDocument, Role } from "../../types";
-import { ChoreVM, UserVM } from "../../types/vm";
+import {IUser, User} from "../../models";
+import {MongoDocument, Role} from "../../types";
+import {getUserRewards} from "../../lib/task.service";
 
 const StyledButtonDiv = styled("div")`
   display: flex;
@@ -36,31 +34,25 @@ const MainStyled = styled("div")`
   max-width: 500px;
 `;
 
-const Parent: NextPage<StaticProps> = ({ users, chores }) => {
+const Parent: NextPage<StaticProps> = ({users}) => {
   const router = useRouter();
   const session = useSession();
 
-  const rows = users.map((user) => {
-    const data = {
-      id: user._id,
-      kid: <ChoreMeAvatar name={user.firstName} />,
-      rewards: 0,
-    };
-    chores.forEach((chore) => {
-      if (chore.assignedTo.includes(user._id)) {
-        data.rewards += chore.points;
+  const rows = users.map((user) => ({
+        id: user.profile._id,
+        kid: <ChoreMeAvatar name={user.profile.firstName}/>,
+        rewards: user.rewards,
       }
-    });
-    return data;
-  });
+    ))
+  ;
 
   return (
     <ChoreLayout
-      avatar={<ChoreMeAvatar name={session.data?.user?.name ?? "Unknow"} />}
+      avatar={<ChoreMeAvatar name={session.data?.user?.name ?? "Unknow"}/>}
       title="Reward Totals"
     >
       <MainStyled>
-        <ChoreMeTable rows={rows} />
+        <ChoreMeTable rows={rows}/>
         <StyledButtonDiv>
           <NormalButton
             variant="contained"
@@ -89,8 +81,7 @@ const Parent: NextPage<StaticProps> = ({ users, chores }) => {
 export default Parent;
 
 type StaticProps = {
-  users: MongoDocument<UserVM>[];
-  chores: MongoDocument<ChoreVM>[];
+  users: { rewards: number, profile: MongoDocument<IUser> }[]
 };
 
 export const getServerSideProps: GetServerSideProps<StaticProps> = async (
@@ -98,26 +89,17 @@ export const getServerSideProps: GetServerSideProps<StaticProps> = async (
 ) => {
   await dbConnect();
   //Check existing
-  const users = (await User.find({ role: { $eq: Role.CHILDREN } }).exec()).map(
-    (doc) => {
-      const json = doc.toJSON<MongoDocument<UserVM>>();
+  const users = await Promise.all((await User.find({role: {$eq: Role.CHILDREN}}).exec())
+    .map(async (user) => {
+      return {
+        profile: JSON.parse(JSON.stringify(user.toJSON<MongoDocument<IUser>>())) as MongoDocument<IUser>,
+        rewards: await getUserRewards(user._id),
+      };
+    }));
 
-      return JSON.parse(JSON.stringify(json));
-    }
-  );
-
-  const chores = (
-    await Chore.find({
-      status: { $eq: "finished" },
-      paidDate: undefined,
-    }).exec()
-  ).map((doc) =>
-    JSON.parse(JSON.stringify(doc.toJSON<MongoDocument<ChoreVM>>()))
-  );
   return {
     props: {
       users,
-      chores,
     },
   };
 };

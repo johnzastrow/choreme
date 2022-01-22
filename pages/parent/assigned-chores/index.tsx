@@ -1,27 +1,32 @@
-import { Stack, Typography } from "@mui/material";
-import { GetServerSideProps, NextPage } from "next";
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/router";
-import { ChoreMeAvatar } from "../../../components/avatar";
-import { NormalButton } from "../../../components/button";
-import { ChoreLayout } from "../../../components/layout";
-import { ChoreNavigation } from "../../../components/navigation";
-import { AssignedChoreTable } from "../../../components/table";
-import { useToast } from "../../../hooks";
-import { useUpdateChoreMutation } from "../../../lib/api";
-import { formatDate } from "../../../lib/date";
+import {Stack, Typography} from "@mui/material";
+import {GetServerSideProps, NextPage} from "next";
+import {useSession} from "next-auth/react";
+import {useRouter} from "next/router";
+import {ChoreMeAvatar} from "../../../components/avatar";
+import {NormalButton} from "../../../components/button";
+import {ChoreLayout} from "../../../components/layout";
+import {ChoreNavigation} from "../../../components/navigation";
+import {AssignedChoreTable} from "../../../components/table";
+import {useToast} from "../../../hooks";
+import {useUpdateChoreMutation, useUpdateTaskMutation} from "../../../lib/api";
+import {formatDate} from "../../../lib/date";
 import dbConnect from "../../../lib/db";
-import { Chore, User } from "../../../models";
-import { MongoDocument, Role } from "../../../types";
-import { ChoreVM, UserVM } from "../../../types/vm";
+import {MongoDocument} from "../../../types";
+import {TaskChoreVM} from "../../../types/vm";
+import Task, {ITask} from "../../../models/task.model";
+import {getTaskChore} from "../../../lib/task.service";
+import {TaskStatus} from "../../../types/enum";
+import {IUser, User} from "../../../models";
 
-const AssignedChores: NextPage<StaticProps> = ({ users, chores }) => {
-  const [updateChore, { isLoading: isUpdating }] = useUpdateChoreMutation();
-  const { showToast } = useToast();
+const AssignedChores: NextPage<StaticProps> = ({chores}) => {
+  const [updateChore, {isLoading: isUpdating}] = useUpdateChoreMutation();
+  const [updateTask, {isLoading: isUpdatingTask}] = useUpdateTaskMutation();
+
+  const {showToast} = useToast();
   const router = useRouter();
   const session = useSession();
   // console.log(router.query);
-  const { day } = router.query;
+  const {day} = router.query;
 
   const date = day ? new Date(day as string) : new Date();
 
@@ -34,26 +39,23 @@ const AssignedChores: NextPage<StaticProps> = ({ users, chores }) => {
     );
   };
 
-  const choreRejecter = (chore: string) => {
-    const _chore = chores.find((c) => c.id === chore);
-    if (_chore) {
-      const { _id, ...choreData } = _chore;
-      choreData.status = "unfinished";
-      updateChore({ _id, ...choreData })
-        .unwrap()
-        .then(() => {
-          showToast("Chore updated successfully", "success");
-          router.reload();
-        })
-        .catch((error) => {
-          showToast(error.data.message, "error");
-        });
-    }
+  const choreRejecter = (_id: string) => {
+    // const _chore = chores.find((c) => c.id === chore);
+    updateTask({_id, status: TaskStatus.UnFinished})
+      .unwrap()
+      .then(() => {
+        showToast("Chore updated successfully", "success");
+        router.reload();
+      })
+      .catch((error) => {
+        showToast(error.data.message, "error");
+      });
   };
+
 
   return (
     <ChoreLayout
-      avatar={<ChoreMeAvatar name={session.data?.user?.name ?? "Unknow"} />}
+      avatar={<ChoreMeAvatar name={session.data?.user?.name ?? "Unknow"}/>}
       title="Assigned Chores"
     >
       <ChoreNavigation
@@ -61,7 +63,7 @@ const AssignedChores: NextPage<StaticProps> = ({ users, chores }) => {
         onPrevious={() => handleDateChange(-1)}
         indicatorText={formatDate(date)}
       />
-      <AssignedChoreTable chores={chores} choreRejector={choreRejecter} />
+      <AssignedChoreTable chores={chores} choreRejector={choreRejecter}/>
       <Stack alignItems={"flex-start"}>
         <NormalButton
           variant="contained"
@@ -79,45 +81,48 @@ const AssignedChores: NextPage<StaticProps> = ({ users, chores }) => {
 
 export default AssignedChores;
 
+export type AssignedTaskChore = TaskChoreVM & {
+  owner: MongoDocument<IUser>;
+}
 type StaticProps = {
-  users: MongoDocument<UserVM>[];
-  chores: MongoDocument<ChoreVM>[];
-};
-
+  chores: AssignedTaskChore [];
+}
 export const getServerSideProps: GetServerSideProps<StaticProps> = async (
-  context
-) => {
-  await dbConnect();
-  //Check existing
-  const users = (await User.find({ role: { $eq: Role.CHILDREN } }).exec()).map(
-    (doc) => {
-      const json = doc.toJSON<MongoDocument<UserVM>>();
+    context
+  ) => {
+    await dbConnect();
 
-      return JSON.parse(JSON.stringify(json));
+    let date: Date;
+
+    if (context.query.day) {
+      date = new Date(context.query.day as string);
+    } else {
+      date = new Date();
     }
-  );
-  let date: Date;
 
-  if (context.query.day) {
-    date = new Date(context.query.day as string);
-  } else {
-    date = new Date();
-  }
-
-  const chores = (
-    await Chore.find({
-      startDate: {
-        $gte: new Date(date.getFullYear(), date.getMonth(), date.getDate()),
-        $lt: new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1),
+    const tasks = (
+      await Task.find({
+        startDate: {
+          $gte: new Date(date.getFullYear(), date.getMonth(), date.getDate()),
+          $lt: new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1),
+        },
+      }).exec()
+    ).map((doc) =>
+      JSON.parse(JSON.stringify(doc.toJSON<MongoDocument<ITask>>()))
+    );
+    const taskChores = await Promise.all((await getTaskChore(tasks)).map(async (taskChore) => {
+      const user = await User.findById(taskChore.task.owner)
+      return {
+        chore: taskChore.chore,
+        task: taskChore.task,
+        owner:
+          JSON.parse(JSON.stringify(user?.toJSON())),
+      }
+    }));
+    return {
+      props: {
+        chores: taskChores,
       },
-    }).exec()
-  ).map((doc) =>
-    JSON.parse(JSON.stringify(doc.toJSON<MongoDocument<ChoreVM>>()))
-  );
-  return {
-    props: {
-      users,
-      chores,
-    },
-  };
-};
+    };
+  }
+;

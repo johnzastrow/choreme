@@ -1,79 +1,76 @@
-import { Checkbox, FormControlLabel, Typography } from '@mui/material'
-import Paper from '@mui/material/Paper'
-import Table from '@mui/material/Table'
-import TableBody from '@mui/material/TableBody'
-import TableCell from '@mui/material/TableCell'
-import TableContainer from '@mui/material/TableContainer'
-import TableHead from '@mui/material/TableHead'
-import TableRow from '@mui/material/TableRow'
-import { GridColDef } from '@mui/x-data-grid'
-import React, { ChangeEvent, Fragment, useImperativeHandle } from 'react'
-import { formatDate } from '../../lib/date'
-import { MongoDocument } from '../../types/MongoDocument'
-import { ChoreVM } from '../../types/vm'
-import { ChoreMeAvatar } from '../avatar'
-import { TextButton } from '../button'
+import { Checkbox, FormControlLabel, Typography } from "@mui/material";
+import Paper from "@mui/material/Paper";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import { GridColDef } from "@mui/x-data-grid";
+import React, { ChangeEvent, Fragment, useImperativeHandle } from "react";
+import { formatDate } from "../../lib/date";
+import { UserTaskData } from "../../types/vm";
+import { TaskChoreVM } from "../../types/vm/TaskChoreVM";
+import { ChoreMeAvatar } from "../avatar";
+import { TextButton } from "../button";
 
 export type RewardsTableProps = {
-  chores: MongoDocument<ChoreVM>[]
-  rejecter: (id: string) => void
-}
+  data: UserTaskData;
+  rejecter: (id: string) => void;
+};
 
 export type RewardsTableHandle = {
-  getSelectedItems: () => MongoDocument<ChoreVM>[]
-  clearSelectedItems: () => void
-}
+  getSelectedItems: () => TaskChoreVM[];
+  clearSelectedItems: () => void;
+};
 
 export const _RewardsTable: React.ForwardRefRenderFunction<
   RewardsTableHandle,
   RewardsTableProps
-> = ({ chores, rejecter }, forwardedRef) => {
+> = ({ data, rejecter }, forwardedRef) => {
   const [state, setState] = React.useState<{
-    selectedItems: MongoDocument<ChoreVM>[]
+    selectedItems: TaskChoreVM[];
   }>({
     selectedItems: [],
-  })
+  });
 
   useImperativeHandle(forwardedRef, () => ({
     getSelectedItems: () => state.selectedItems,
     clearSelectedItems: () => setState({ selectedItems: [] }),
-  }))
+  }));
 
   const onSelectedItemsChange = (
     e: ChangeEvent<HTMLInputElement>,
-    selectedItem: string
+    selectedItem: TaskChoreVM
   ) => {
-    const selectedChore = chores.find((chore) => chore.id === selectedItem)
-    if (state.selectedItems.some((chore) => chore.id === selectedItem)) {
-      setState({
-        selectedItems: state.selectedItems.filter(
-          (chore) => chore.id !== selectedItem
-        ),
-      })
-    } else {
-      selectedChore &&
-        setState({ selectedItems: [...state.selectedItems, selectedChore] })
-    }
-  }
+    state.selectedItems.includes(selectedItem)
+      ? setState({
+          selectedItems: state.selectedItems.filter(
+            (item) => item.task._id !== selectedItem.task._id
+          ),
+        })
+      : setState({ selectedItems: [...state.selectedItems, selectedItem] });
+  };
 
-  const rows = chores.map((chore) => ({
-    id: chore.id,
-    kid: <ChoreMeAvatar />,
-    startDate: chore.startDate && new Date(chore.startDate),
-    chore: chore.name,
-    rewards: chore.points,
-    status: chore.status,
-  }))
+  const rows = data.tasks.map((chore) => ({
+    id: chore.task._id,
+    kid: <ChoreMeAvatar name={data.profile.firstName} />,
+    startDate: chore.task.startDate && new Date(chore.task.startDate),
+    chore: chore.chore?.name,
+    rewards: chore.chore?.points,
+    status: chore.task.status,
+    task: chore,
+  }));
   const columns: GridColDef[] = [
-    { field: 'kid', headerName: 'Kid' },
-    { field: 'startDate', headerName: 'Start Date' },
-    { field: 'chore', headerName: 'Chore' },
-    { field: 'rewards', headerName: 'Rewards' },
-    { field: 'status', headerName: 'Status' },
-  ]
+    { field: "kid", headerName: "Kid" },
+    { field: "startDate", headerName: "Start Date" },
+    { field: "chore", headerName: "Chore" },
+    { field: "rewards", headerName: "Rewards" },
+    { field: "status", headerName: "Status" },
+  ];
   return (
     <TableContainer component={Paper}>
-      <Table aria-label='simple table'>
+      <Table aria-label="simple table">
         <TableHead>
           <TableRow>
             {columns.map((column) => (
@@ -87,22 +84,22 @@ export const _RewardsTable: React.ForwardRefRenderFunction<
               key={row.id}
               // sx={{ "&:last-child td, &:last-child th": { border: 1 } }}
             >
-              <TableCell component='th' scope='row'>
+              <TableCell component="th" scope="row">
                 {row.kid}
               </TableCell>
-              <TableCell align='right'>
+              <TableCell align="right">
                 {row.startDate && formatDate(row.startDate)}
               </TableCell>
-              <TableCell align='right'>{row.chore}</TableCell>
-              <TableCell align='right'>{row.rewards}</TableCell>
-              <TableCell align='right'>
+              <TableCell align="right">{row.chore}</TableCell>
+              <TableCell align="right">{row.rewards}</TableCell>
+              <TableCell align="right">
                 <Fragment>
                   <FormControlLabel
                     control={
                       <Checkbox
-                        onChange={(e) => onSelectedItemsChange(e, row.id)}
+                        onChange={(e) => onSelectedItemsChange(e, row.task)}
                         checked={state.selectedItems.some(
-                          (chore) => chore.id === row.id
+                          (chore) => chore.task._id === row.id
                         )}
                       />
                     }
@@ -118,6 +115,6 @@ export const _RewardsTable: React.ForwardRefRenderFunction<
         </TableBody>
       </Table>
     </TableContainer>
-  )
-}
-export const RewardsTable = React.forwardRef(_RewardsTable)
+  );
+};
+export const RewardsTable = React.forwardRef(_RewardsTable);

@@ -1,3 +1,4 @@
+import { Typography } from "@mui/material";
 import Chip from "@mui/material/Chip";
 import Paper from "@mui/material/Paper";
 import Stack from "@mui/material/Stack";
@@ -9,12 +10,12 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import React from "react";
 import { formatDate } from "../../lib/date";
-import { MongoDocument } from "../../types/MongoDocument";
-import { ChoreVM } from "../../types/vm";
+import { TaskChoreVM } from "../../types/vm";
 import { TextButton } from "../button";
+import NormalButton from "../button/NormalButton";
 
 export type AssignedChoreTableProps = {
-  chores: MongoDocument<ChoreVM>[];
+  chores: TaskChoreVM[];
   choreFinisher: (id: string) => void;
 };
 
@@ -22,15 +23,20 @@ export function ChildrenAssignedChoreTable({
   chores,
   choreFinisher,
 }: AssignedChoreTableProps) {
-  const rows = chores.map((chore) => ({
-    id: chore._id,
-    startDate: chore.startDate
-      ? formatDate(new Date(chore.startDate))
-      : formatDate(new Date()),
-    chore: chore.name,
-    status: chore.status,
-    paid: chore.paidDate !== undefined,
-  }));
+  const rows = chores.map((chore) => {
+    const { chore: _chore, task } = chore;
+    return {
+      id: _chore?._id,
+      startDate: task.startDate
+        ? formatDate(new Date(task.startDate))
+        : formatDate(new Date()),
+      chore: _chore?.name,
+      points: _chore?.points,
+      status: task.status,
+      paid: task.paidDate !== undefined,
+      taskId: task._id,
+    };
+  });
 
   return (
     <TableContainer component={Paper}>
@@ -51,19 +57,21 @@ export function ChildrenAssignedChoreTable({
               <TableCell component="th" scope="row">
                 {row.startDate}
               </TableCell>
-              <TableCell align="right">{row.chore}</TableCell>
+              <TableCell align="right">
+                {row.chore} ({row.points})
+              </TableCell>
               <TableCell align="center">
                 <Stack direction={"column"}>
                   {row.status}
                   {row.status !== "finished" && (
-                    <TextButton onClick={() => choreFinisher(row.id)}>
-                      Finish
-                    </TextButton>
+                    <NormalButton onClick={() => choreFinisher(row.taskId)}>
+                      <Chip label="Finish" color="success" />
+                    </NormalButton>
                   )}
                   {row.paid ? (
-                    <Chip label="Paid" color="primary" />
+                    <Typography color="primary">Paid</Typography>
                   ) : (
-                    <Chip label="Unpaid" color="error" variant="outlined" />
+                    <Typography color="error">Unpaid</Typography>
                   )}
                 </Stack>
               </TableCell>

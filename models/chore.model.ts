@@ -5,12 +5,7 @@ export interface IChore extends Document {
   name: string;
   points: number;
   assignedTo: string[];
-  createdDate: Date;
-  startDate?: Date;
-  finishedDate?: Date;
-  paidDate?: Date;
-  recurrence: string;
-  status: string;
+  recurrence?: string;
 }
 
 const ChoreSchema: Schema = new Schema({
@@ -22,14 +17,10 @@ const ChoreSchema: Schema = new Schema({
     required: true,
   },
   createdDate: { type: Date, default: Date.now },
-  startDate: { type: Date },
-  finishedDate: { type: Date },
-  paidDate: { type: Date },
-  recurrence: { type: String, default: "None" },
-  status: { type: String, default: "unfinished" },
+  recurrence: { type: Schema.Types.ObjectId, ref: "Recurrence" },
 });
 
 const Chore =
   (mongoose.models.Chore as mongoose.Model<IChore>) ||
-  mongoose.model<IChore>("Chore", ChoreSchema);
+  mongoose.model<IChore>("Chore", ChoreSchema, "chore");
 export default Chore;

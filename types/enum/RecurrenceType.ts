@@ -1,4 +1,4 @@
-export enum Recurrence {
+export enum RecurrenceType {
     Daily = 'Daily',
     Weekly = 'Weekly',
     Monthly = 'Monthly',

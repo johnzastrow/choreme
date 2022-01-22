@@ -6,20 +6,19 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
-import { ChoreMeAvatar } from "../avatar";
-import { MongoDocument } from "../../types/MongoDocument";
-import { ChoreVM } from "../../types/vm";
+import {ChoreMeAvatar} from "../avatar";
+import {TaskChoreVM} from "../../types/vm";
 
 export type AssignedChoreTableProps = {
-  chores: MongoDocument<ChoreVM>[];
+  chores: TaskChoreVM[];
 };
 
 export function AssignedChoreTable({ chores }: AssignedChoreTableProps) {
   const rows = chores.map((chore) => ({
-    id: chore.id,
+    id: chore.task.id,
     kid: <ChoreMeAvatar />,
-    chore: chore.name,
-    status: chore.status,
+    chore: chore.chore?.name,
+    status: chore.task.status,
   }));
 
   return (

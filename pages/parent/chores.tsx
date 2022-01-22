@@ -1,96 +1,122 @@
-import { MobileDatePicker } from "@mui/lab";
+import {MobileDatePicker} from "@mui/lab";
 import DateAdapter from "@mui/lab/AdapterMoment";
 import LocalizationProvider from "@mui/lab/LocalizationProvider";
 import {
   Autocomplete,
   Checkbox,
   createFilterOptions,
-  FormControl,
   FormControlLabel,
   FormGroup,
-  InputLabel,
-  MenuItem,
-  Select,
   SelectChangeEvent,
   Stack,
   TextField,
   Typography,
 } from "@mui/material";
-import { GetServerSideProps, NextPage } from "next";
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
-import { v4 as uuidv4 } from "uuid";
-import { ChoreMeAvatar } from "../../components/avatar";
+import {GetServerSideProps, NextPage} from "next";
+import {useSession} from "next-auth/react";
+import {useRouter} from "next/router";
+import React, {useEffect, useState} from "react";
+import {v4 as uuidv4} from "uuid";
+import {ChoreMeAvatar} from "../../components/avatar";
 import NormalButton from "../../components/button/NormalButton";
-import { ChoreLayout } from "../../components/layout";
+import {ChoreLayout} from "../../components/layout";
+import {RecurrenceSelector} from "../../components/recurrence-selector";
 import NormalTextInput from "../../components/text-input/normal-text-input";
-import { useToast } from "../../hooks";
-import {
-  useCreateChoreMutation,
-  useDeleteChoreMutation,
-  useUpdateChoreMutation,
-} from "../../lib/api";
+import {useToast} from "../../hooks";
+import {useCreateChoreMutation, useDeleteChoreMutation, useUpdateChoreMutation,} from "../../lib/api";
 import dbConnect from "../../lib/db";
-import { Chore, User } from "../../models";
-import { ChoreStatus, MongoDocument, Role } from "../../types";
-import { Recurrence } from "../../types/Recurrence";
-import { ChoreVM, UserVM } from "../../types/vm";
+import {Chore, IChore, User} from "../../models";
+import Recurrence, {IRecurrence} from "../../models/recurrence.model";
+import {MongoDocument, Role} from "../../types";
+import {RecurrenceType} from "../../types/enum";
+import {UserVM} from "../../types/vm";
+import {CreateChoreVM} from "../../types/vm/CreateChoreVM";
 
-const filter = createFilterOptions<ChoreVM>();
+const filter = createFilterOptions<CreateChoreVM["chore"]>();
 
-const initialState = {
-  id: "",
-  name: "",
-  points: 0,
-  assignedTo: [],
-  createdDate: new Date(),
-  recurrence: Recurrence.None,
-  status: ChoreStatus.UNFINISHED,
+const initialState: CreateChoreVM = {
+  chore: {
+    id: uuidv4(),
+    name: "",
+    points: 0,
+    assignedTo: [],
+  },
+  recurrence: {
+    id: uuidv4(),
+    type: RecurrenceType.None,
+    repeat: [],
+    startDate: new Date(),
+  },
 };
-const Chores: NextPage<StaticProps> = ({ users, chores }) => {
+const Chores: NextPage<StaticProps> = ({users, chores, recurrences}) => {
   const router = useRouter();
   const session = useSession();
-  const { id } = router.query;
+  const {id} = router.query;
 
   // Queries
-  const [createChore, { isLoading }] = useCreateChoreMutation();
-  const [updateChore, { isLoading: isUpdating }] = useUpdateChoreMutation();
-  const [deleteChore, { isLoading: isDeleting }] = useDeleteChoreMutation();
+  const [createChore, {isLoading}] = useCreateChoreMutation();
+  const [updateChore, {isLoading: isUpdating}] = useUpdateChoreMutation();
+  const [deleteChore, {isLoading: isDeleting}] = useDeleteChoreMutation();
 
-  const { showToast } = useToast();
-  const [state, setState] = useState<{ _id?: string } & ChoreVM>(initialState);
+  const {showToast} = useToast();
+  const [state, setState] = useState<{ _id?: string } & CreateChoreVM>(
+    initialState
+  );
   const initialSelectedUsers = users.map((user) => ({
     ...user,
     isSelected: false,
   }));
   const [selectedUsers, setSelectedUsers] = useState(initialSelectedUsers);
 
+  const mapExistingChoreToState = (id: string) => {
+    const chore = chores.find((_chore) => _chore._id === id);
+    if (chore) {
+      const {_id, ...data} = chore;
+      const recurrence = recurrences.find(
+        (_recurrence) => _recurrence._id === chore.recurrence
+      );
+
+      setState({
+        _id: chore._id,
+        chore: {
+          id: data.id,
+          name: data.name,
+          points: data.points,
+          assignedTo: data.assignedTo,
+        },
+        recurrence: recurrence
+          ? {
+            id: recurrence.id,
+            type: recurrence.type,
+            repeat: recurrence.repeat,
+            startDate: recurrence.startDate,
+          }
+          : {
+            ...state.recurrence,
+          },
+      });
+
+      setButtonVisibility((prevState) => {
+        return {
+          ...prevState,
+          save: true,
+          delete: true,
+          new: false,
+        };
+      });
+    }
+  };
+
   useEffect(() => {
     if (id) {
-      const chore = chores.find((_chore) => _chore._id === id);
-      if (chore) {
-        setState(chore);
-        setButtonVisibility((prevState) => {
-          return {
-            ...prevState,
-            save: true,
-            delete: true,
-            new: false,
-          };
-        });
-      }
+      mapExistingChoreToState(id as string);
     }
   }, []);
 
   useEffect(() => {
     setSelectedUsers((preState) =>
       preState.map((user) => {
-        if (state.assignedTo.includes(user._id)) {
-          user.isSelected = true;
-        } else {
-          user.isSelected = false;
-        }
+        user.isSelected = state.chore.assignedTo.includes(user._id);
         return user;
       })
     );
@@ -104,6 +130,8 @@ const Chores: NextPage<StaticProps> = ({ users, chores }) => {
   });
 
   function resetAllState() {
+    initialState.chore.id = uuidv4();
+    initialState.recurrence.id = uuidv4();
     setState(initialState);
     setSelectedUsers(initialSelectedUsers);
   }
@@ -114,24 +142,45 @@ const Chores: NextPage<StaticProps> = ({ users, chores }) => {
       const points = isNaN(parseFloat(event.target.value))
         ? 0
         : parseFloat(event.target.value);
-      setState({ ...state, points });
+      setState((prevState) => ({
+        ...prevState,
+        chore: {...prevState.chore, points: points},
+      }));
     }
   };
 
-  const handleChange = (event: SelectChangeEvent<Recurrence>) => {
-    const value = event.target.value as Recurrence;
-    setState({ ...state, recurrence: value });
+  const handleChange = (event: SelectChangeEvent<RecurrenceType>) => {
+    const value = event.target.value as RecurrenceType;
+    setState((prevState) => {
+      const recurrence = prevState.recurrence
+        ? {
+          id: prevState.recurrence.id,
+          type: value,
+          repeat: prevState.recurrence.repeat,
+          startDate: prevState.recurrence.startDate,
+        }
+        : {
+          id: uuidv4(),
+          type: RecurrenceType.None,
+          repeat: [],
+          startDate: new Date(),
+        };
+      return {
+        ...prevState,
+        recurrence,
+      };
+    });
   };
 
   return (
     <ChoreLayout
       title={"Chore"}
       isLoading={isLoading || isUpdating || isDeleting}
-      avatar={<ChoreMeAvatar name={session.data?.user?.name ?? "Unknow"} />}
+      avatar={<ChoreMeAvatar name={session.data?.user?.name ?? "Unknow"}/>}
     >
       <Stack spacing={2}>
         <Autocomplete
-          value={state}
+          value={state.chore}
           onChange={(event, newValue) => {
             const regex = /Add "([^"]*)"/gm;
 
@@ -141,7 +190,16 @@ const Chores: NextPage<StaticProps> = ({ users, chores }) => {
                 const _name = newValue.name
                   .match(regex)![0]
                   .replace(regex, "$1");
-                setState({ ...initialState, name: _name, id: newValue.id });
+                setState((prevState) => {
+                  return {
+                    ...prevState,
+                    chore: {
+                      ...prevState.chore,
+                      name: _name,
+                      id: newValue.id,
+                    },
+                  };
+                });
                 setButtonVisibility({
                   ...buttonVisibility,
                   new: true,
@@ -152,13 +210,7 @@ const Chores: NextPage<StaticProps> = ({ users, chores }) => {
                   (_chore) => _chore.name === newValue.name
                 );
                 if (chore) {
-                  setState(chore);
-                  setButtonVisibility({
-                    ...buttonVisibility,
-                    save: true,
-                    delete: true,
-                    new: false,
-                  });
+                  mapExistingChoreToState(chore._id);
                 }
               }
             }
@@ -166,14 +218,14 @@ const Chores: NextPage<StaticProps> = ({ users, chores }) => {
           filterOptions={(options, params) => {
             const filtered = filter(options, params);
 
-            const { inputValue } = params;
+            const {inputValue} = params;
             // Suggest the creation of a new value
             const isExisting = options.some(
               (option) => inputValue === option.name
             );
             if (inputValue !== "" && !isExisting) {
               filtered.push({
-                ...state,
+                ...state.chore,
                 id: uuidv4(),
                 name: `Add "${inputValue}"`,
               });
@@ -197,7 +249,7 @@ const Chores: NextPage<StaticProps> = ({ users, chores }) => {
           freeSolo
           renderInput={(params) => (
             <NormalTextInput
-              value={state.name}
+              value={state.chore.name}
               label="Search or add chore name "
               color="primary"
               name="chore"
@@ -212,8 +264,8 @@ const Chores: NextPage<StaticProps> = ({ users, chores }) => {
           color="primary"
           name="chore-amount"
           type="number"
-          value={state.points !== 0 ? state.points : undefined}
-          focused={state.points !== 0}
+          value={state.chore.points !== 0 ? state.chore.points : undefined}
+          focused={state.chore.points !== 0}
           onChange={onTextChanged}
         />
         <Stack direction={"row"} justifyContent={"space-between"}>
@@ -223,52 +275,85 @@ const Chores: NextPage<StaticProps> = ({ users, chores }) => {
                 key={user.id}
                 onChange={(_, checked) => {
                   if (checked) {
-                    setState({
-                      ...state,
-                      assignedTo: [...state.assignedTo, user._id],
+                    setState((prevState) => {
+                      return {
+                        ...prevState,
+                        chore: {
+                          ...prevState.chore,
+                          assignedTo: [...prevState.chore.assignedTo, user._id],
+                        },
+                      };
                     });
                   } else {
-                    setState({
-                      ...state,
-                      assignedTo: state.assignedTo.filter(
-                        (id) => id !== user._id
-                      ),
+                    setState((prevState) => {
+                      return {
+                        ...prevState,
+                        chore: {
+                          ...prevState.chore,
+                          assignedTo: prevState.chore.assignedTo.filter(
+                            (id) => id !== user._id
+                          ),
+                        },
+                      };
                     });
                   }
                 }}
-                control={<Checkbox checked={user.isSelected} />}
+                control={<Checkbox checked={user.isSelected}/>}
                 label={`${user.firstName} ${user.lastName}`}
               />
             ))}
           </FormGroup>
-          <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
-            <InputLabel id="demo-simple-select-standard-label">
-              Recurrence
-            </InputLabel>
-            <Select
-              labelId="demo-simple-select-standard-label"
-              id="demo-simple-select-standard"
-              value={state?.recurrence as Recurrence}
-              onChange={handleChange}
-              label="Recurrence"
-            >
-              {Object.entries(Recurrence).map(([key, value]) => (
-                <MenuItem key={key} value={value}>
-                  {key}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
         </Stack>
+        <RecurrenceSelector
+          recurrence={state.recurrence}
+          onRecurrenceChange={(value) => {
+            setState((prevState) => {
+              const recurrence = prevState.recurrence
+                ? {
+                  ...prevState.recurrence,
+                  type: value.type,
+                  repeat: value.repeat,
+                }
+                : {
+                  id: uuidv4(),
+                  type: value.type,
+                  repeat: value.repeat,
+                  startDate: new Date(),
+                };
+
+              return {
+                ...prevState,
+                recurrence,
+              };
+            });
+          }}
+        />
+
         <Stack>
           <LocalizationProvider dateAdapter={DateAdapter}>
             {" "}
             <MobileDatePicker
               renderInput={(props) => <TextField {...props} />}
               label="Start Date"
-              value={state.startDate}
+              value={state.recurrence?.startDate}
               onChange={(newValue) => {
-                setState({ ...state, startDate: newValue! });
+                setState((prevState) => {
+                  const recurrence = prevState.recurrence
+                    ? {
+                      ...prevState.recurrence,
+                      startDate: newValue!,
+                    }
+                    : {
+                      id: uuidv4(),
+                      type: RecurrenceType.None,
+                      repeat: [],
+                      startDate: newValue!,
+                    };
+                  return {
+                    ...prevState,
+                    recurrence,
+                  };
+                });
               }}
             />
           </LocalizationProvider>
@@ -278,19 +363,20 @@ const Chores: NextPage<StaticProps> = ({ users, chores }) => {
             disabled={!buttonVisibility.save}
             variant="contained"
             color="primary"
-            sx={{ flex: 1 }}
+            sx={{flex: 1}}
             onClick={() => {
-              const { _id, ...data } = state;
+              const {_id, ...data} = state;
               _id &&
-                updateChore({ _id, ...data })
-                  .unwrap()
-                  .then(() => {
-                    resetAllState();
-                    showToast("Chore updated successfully", "success");
-                  })
-                  .catch((error) => {
-                    showToast(error.data.message, "error");
-                  });
+              updateChore({_id, ...data})
+                .unwrap()
+                .then(() => {
+                  resetAllState();
+                  showToast("Chore updated successfully", "success");
+                  router.reload();
+                })
+                .catch((error) => {
+                  showToast(error.data.message, "error");
+                });
             }}
           >
             <Typography variant="button">Save</Typography>
@@ -299,7 +385,7 @@ const Chores: NextPage<StaticProps> = ({ users, chores }) => {
             disabled={!buttonVisibility.cancel}
             variant="contained"
             color="primary"
-            sx={{ flex: 1 }}
+            sx={{flex: 1}}
             onClick={() => router.replace("/parent/assigned-chores")}
           >
             <Typography variant="button">Cancel</Typography>
@@ -310,14 +396,15 @@ const Chores: NextPage<StaticProps> = ({ users, chores }) => {
             disabled={!buttonVisibility.new}
             variant="contained"
             color="primary"
-            sx={{ flex: 1 }}
+            sx={{flex: 1}}
             onClick={() => {
-              const { _id: _, ...data } = state;
+              const {_id: _, ...data} = state;
               createChore(data)
                 .unwrap()
                 .then(() => {
                   resetAllState();
                   showToast("Chore created successfully", "success");
+                  router.reload();
                 })
                 .catch((error) => {
                   showToast(error.data.message, "error");
@@ -330,19 +417,20 @@ const Chores: NextPage<StaticProps> = ({ users, chores }) => {
             disabled={!buttonVisibility.delete}
             variant="contained"
             color="primary"
-            sx={{ flex: 1 }}
+            sx={{flex: 1}}
             onClick={() => {
-              const { _id } = state;
+              const {_id} = state;
               _id &&
-                deleteChore({ _id })
-                  .unwrap()
-                  .then(() => {
-                    resetAllState();
-                    showToast("Chore deleted successfully", "success");
-                  })
-                  .catch((error) => {
-                    showToast(error.data.message, "error");
-                  });
+              deleteChore({_id})
+                .unwrap()
+                .then(() => {
+                  resetAllState();
+                  showToast("Chore deleted successfully", "success");
+                  router.reload();
+                })
+                .catch((error) => {
+                  showToast(error.data.message, "error");
+                })
             }}
           >
             <Typography variant="button">Delete</Typography>
@@ -356,7 +444,8 @@ const Chores: NextPage<StaticProps> = ({ users, chores }) => {
 export default Chores;
 type StaticProps = {
   users: MongoDocument<UserVM>[];
-  chores: MongoDocument<ChoreVM>[];
+  chores: MongoDocument<IChore>[];
+  recurrences: MongoDocument<IRecurrence>[];
 };
 
 export const getServerSideProps: GetServerSideProps<StaticProps> = async (
@@ -364,7 +453,7 @@ export const getServerSideProps: GetServerSideProps<StaticProps> = async (
 ) => {
   await dbConnect();
   //Check existing
-  const users = (await User.find({ role: { $eq: Role.CHILDREN } }).exec()).map(
+  const users = (await User.find({role: {$eq: Role.CHILDREN}}).exec()).map(
     (doc) => {
       const json = doc.toJSON<MongoDocument<UserVM>>();
 
@@ -372,12 +461,18 @@ export const getServerSideProps: GetServerSideProps<StaticProps> = async (
     }
   );
   const chores = (await Chore.find({}).exec()).map((doc) =>
-    JSON.parse(JSON.stringify(doc.toJSON<MongoDocument<ChoreVM>>()))
+    JSON.parse(JSON.stringify(doc.toJSON<MongoDocument<IChore>>()))
   );
+
+  const recurrences = (await Recurrence.find({}).exec()).map((doc) =>
+    JSON.parse(JSON.stringify(doc.toJSON<MongoDocument<IRecurrence>>()))
+  );
+
   return {
     props: {
       users,
       chores,
+      recurrences,
     },
   };
 };

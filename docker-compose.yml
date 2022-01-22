@@ -17,7 +17,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.mongodb
-    image: choreme/mongo
+    image: choreme.net:5000/mongo
     restart: always
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
@@ -46,5 +46,10 @@ services:
       ME_CONFIG_MONGODB_URL: mongodb://${MONGO_USER}:${MONGO_PASS}@mongo:27017/
     env_file:
       - ".env.local"
+  cron-job:
+    build:
+      context: .
+      dockerfile: Dockerfile.crontab
+    image: choreme.net:5000/crontab
 volumes:
   mongo-data:

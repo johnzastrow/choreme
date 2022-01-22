@@ -1,0 +1,9 @@
+[
+  {
+    "name": "Recurring Job",
+    "comment": "This job will run every day for recurring task",
+    "schedule": "@midnight",
+    "command": "curl --location --request GET 'http://web:3000/api/parent/recurring'",
+    "onstart": true
+  }
+]

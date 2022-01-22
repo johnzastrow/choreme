@@ -1,14 +1,10 @@
-import { IChore } from "../../models/chore.model";
+import {IChore} from "../../models";
+import {ITask} from "../../models/task.model";
 
 export type ChoreVM = {
   id: IChore["id"];
   name: IChore["name"];
   points: IChore["points"];
   assignedTo: IChore["assignedTo"];
-  createdDate: IChore["createdDate"];
-  startDate?: IChore["startDate"];
-  finishedDate?: IChore["finishedDate"];
-  paidDate?: IChore["paidDate"];
-  recurrence: IChore["recurrence"];
-  status: IChore["status"];
+  startDate: ITask["startDate"];
 };

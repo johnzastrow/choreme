@@ -18,24 +18,22 @@ services:
       context: .
       dockerfile: Dockerfile.mongodb
     image: choreme/mongo
-    restart: always
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASS}
       MONGO_INITDB_DATABASE: ${MONGO_DB}
     ports:
-      - 27017:27017
+      - "27017:27017"
     volumes:
       - "mongo-data:/data/db"
       # - "$PWD/mongo-entrypoint/:/docker-entrypoint-initdb.d/"
     env_file:
-      - .env
+      - .env.local
 
   mongo-express:
     image: mongo-express
     depends_on:
       - mongo
-    restart: always
     links:
       - mongo
     ports:
@@ -43,8 +41,15 @@ services:
     environment:
       ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_USER}
       ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_PASS}
-      ME_CONFIG_MONGODB_URL: mongodb://${MONGO_USER}:${MONGO_PASS}@mongo:27017/
+      ME_CONFIG_MONGODB_URL: mongodb://${MONGO_USER}:${MONGO_PASS}@host.docker.internal:27017/
     env_file:
-      - .env
+      - .env.local
+  cron-job:
+    build:
+      context: .
+      dockerfile: Dockerfile.crontab
+    network_mode: "host"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
 volumes:
   mongo-data:
