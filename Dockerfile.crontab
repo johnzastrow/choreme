@@ -1,0 +1,5 @@
+FROM willfarrell/crontab
+
+RUN apk --no-cache add curl
+
+COPY crontab/config.json ${HOME_DIR}/
