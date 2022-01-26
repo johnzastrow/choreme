@@ -17,6 +17,8 @@ import Task, {ITask} from "../../../models/task.model";
 import {getTaskChore} from "../../../lib/task.service";
 import {TaskStatus} from "../../../types/enum";
 import {IUser, User} from "../../../models";
+import moment from "moment";
+import {useEffect, useState} from "react";
 
 const AssignedChores: NextPage<StaticProps> = ({chores}) => {
   const [updateChore, {isLoading: isUpdating}] = useUpdateChoreMutation();
@@ -28,15 +30,18 @@ const AssignedChores: NextPage<StaticProps> = ({chores}) => {
   // console.log(router.query);
   const {day} = router.query;
 
-  const date = day ? new Date(day as string) : new Date();
+  const [date, setDate] = useState<Date>(day ? new Date(day as string) : new Date());
 
-  const handleDateChange = (value: number) => {
-    date.setDate(date.getDate() + value);
+  useEffect(() => {
     router.push(
       `/parent/assigned-chores?day=${date.getFullYear()}-${
         date.getMonth() + 1
       }-${date.getDate()}`
     );
+  }, [date]);
+
+  const handleDateChange = (value: number) => {
+    setDate((prevState) => moment(prevState).add(value, "days").toDate())
   };
 
   const choreRejecter = (_id: string) => {
