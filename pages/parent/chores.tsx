@@ -31,6 +31,7 @@ import {MongoDocument, Role} from "../../types";
 import {RecurrenceType} from "../../types/enum";
 import {UserVM} from "../../types/vm";
 import {CreateChoreVM} from "../../types/vm/CreateChoreVM";
+import moment from "moment";
 
 const filter = createFilterOptions<CreateChoreVM["chore"]>();
 
@@ -112,6 +113,57 @@ const Chores: NextPage<StaticProps> = ({users, chores, recurrences}) => {
       mapExistingChoreToState(id as string);
     }
   }, []);
+
+  useEffect(() => {
+    const startDate = state.recurrence.startDate
+    const repeat = state.recurrence.repeat
+    let nextStateDate: Date = startDate;
+
+    if (repeat.length > 0) {
+      switch (state.recurrence.type) {
+        case RecurrenceType.Weekly:
+          const weekday = moment(startDate).isoWeekday()
+          let nextDay: number | undefined;
+          if (!repeat.includes(weekday)) {
+            nextDay = repeat.find((day) => day > weekday)
+            if (!nextDay) {
+              nextDay = repeat[0]
+              nextStateDate = moment(startDate).add(1, 'weeks').isoWeekday(nextDay).toDate()
+            } else {
+              nextStateDate = moment(startDate).isoWeekday(nextDay).toDate()
+            }
+          }
+          break;
+        case RecurrenceType.Monthly:
+          const date = moment(startDate).date()
+          let nextDate: number | undefined;
+          if (!repeat.includes(date)) {
+            nextDate = repeat.find((day) => day > date)
+            if (!nextDate) {
+              nextDate = repeat[0]
+              nextStateDate = moment(startDate).add(1, 'months').date(nextDate).toDate()
+            } else {
+              nextStateDate = moment(startDate).date(nextDate).toDate()
+            }
+          }
+          break;
+        default:
+          nextStateDate = new Date()
+          break;
+      }
+    } else {
+      nextStateDate = new Date()
+    }
+
+    setState((prevState) => ({
+      ...prevState,
+      recurrence: {
+        ...prevState.recurrence,
+        startDate: nextStateDate
+      },
+    }))
+
+  }, [state.recurrence.repeat]);
 
   useEffect(() => {
     setSelectedUsers((preState) =>
