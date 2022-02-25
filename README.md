@@ -37,9 +37,6 @@ First ==> second ==> BobsUncle ==>
 Salesman == text ==> BDM[Business development manager]
 
 
-flowchart TP
-AM -- updates tag in CW --> B -- Notifies BDM --> BDM
-
 
 flowchart LR
 Fish --> Fly & Owl--> Horse
