@@ -4,3 +4,8 @@ A simple. mobile-first web app to manage chores/tasks and rewards for parents an
 It is developed using Python (Flask) and MongoDB for the application and database respectively. The front end is built using Nextjs + ReactJS.
 
 [Netxjs](https://nextjs.org/)
+
+
+```mermaid
+flowchart LR
+id1(I am text in a box)
