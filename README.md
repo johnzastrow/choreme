@@ -107,6 +107,8 @@ flowchart TB
     end
 ```
 
+Why is this broken
+
 ```mermaid
 sequenceDiagram
     Alice->>Bob: Hello Bob, how are you?
@@ -117,6 +119,6 @@ sequenceDiagram
     end
     opt Extra response
         Bob->>Alice: Thanks for asking
-    end
+    en
     
     ```
