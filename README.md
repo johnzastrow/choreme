@@ -19,8 +19,9 @@ A-->B
 
 
 A --- B
+```
+#### Does this work now?
 
-```mermaid
 flowchart LR
 C-- This is the text! ---D
 
@@ -39,14 +40,14 @@ Salesman == text ==> BDM[Business development manager]
 
 
 
-```mermaid
+
 flowchart TB
     Cheese --> Bacon
     Cheese --> Lettuce
     Bun --> Bacon
     Bun --> Lettuce
     
-    ```mermaid
+ 
     graph TD
     A[Christmas] -->|Get money| B(Go shopping)
     B --> C{Let me think}
@@ -54,7 +55,7 @@ flowchart TB
     C -->|Two| E[iPhone]
     C -->|Three| F[fa:fa-car Car]
     
-    ```mermaid
+
     erDiagram
           CUSTOMER }|..|{ DELIVERY-ADDRESS : has
           CUSTOMER ||--o{ ORDER : places
@@ -65,3 +66,16 @@ flowchart TB
           PRODUCT-CATEGORY ||--|{ PRODUCT : contains
           PRODUCT ||--o{ ORDER-ITEM : "ordered in"
   
+graph LR
+
+A & B--> C & D
+style A fill:#f9f,stroke:#333,stroke-width:px
+style B fill:#bbf,stroke:#f66,stroke-width:2px,color:#fff,stroke-dasharray: 5 5
+
+subgraph beginning
+A & B
+end
+
+subgraph ending
+C & D
+end
