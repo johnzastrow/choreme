@@ -13,13 +13,13 @@ id2[(Database)]
 id3>This is the text in the box]
 id4{{This is the text in the box}}
 id5[/This is the text in the box/]
-id5[\This is the text in the box\]
+id6[\This is the text in the box\]
 
 A-->B
 
 
 A --- B
-I am a comment. The above is two lines from A to B, but it draws in one diagram
+
 
 C-- This is the text! ---D
 
@@ -57,4 +57,10 @@ flowchart TB
     Bun --> Bacon
     Bun --> Lettuce
     
-    
+    graph TD
+    A[Christmas] -->|Get money| B(Go shopping)
+    B --> C{Let me think}
+    C -->|One| D[Laptop]
+    C -->|Two| E[iPhone]
+    C -->|Three| F[fa:fa-car Car]
+  
