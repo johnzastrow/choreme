@@ -16,6 +16,12 @@ id5[/This is the text in the box/]
 id5[\This is the text in the box\]
 
 A-->B
+
+
 A --- B
-A-- This is the text! ---B
-A---|This is the text|B
+
+
+C-- This is the text! ---D
+
+
+E---|This is the text|F
