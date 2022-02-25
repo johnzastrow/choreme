@@ -119,6 +119,5 @@ sequenceDiagram
     end
     opt Extra response
         Bob->>Alice: Thanks for asking
-    en
-    
-    ```
+    end
+ ```
