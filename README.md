@@ -19,9 +19,42 @@ A-->B
 
 
 A --- B
-
+I am a comment. The above is two lines from A to B, but it draws in one diagram
 
 C-- This is the text! ---D
 
 
 E---|This is the text|F
+
+Cat-->|text|Dog
+
+manager-- text -->worker
+
+
+Order-.->Ship;
+
+
+Inrement ID-. text .-> Bob's your uncle
+
+First ==> second
+
+Salesman == text ==> Business development manager
+
+
+AM -- updates tag in CW --> B -- Notifies BDM --> BDM
+
+
+
+Fish --> Fly & Owl--> Horse
+
+
+Kelly & Tim--> Tina & Todd
+
+
+flowchart TB
+    Cheese --> Bacon
+    Cheese --> Lettuce
+    Bun --> Bacon
+    Bun --> Lettuce
+    
+    
