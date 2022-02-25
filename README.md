@@ -32,13 +32,10 @@ manager-- text -->worker
 
 flowchart LR
 Order-.->Ship;
+InrementID-. text .-> BobsUncle
+First ==> second ==> BobsUncle ==>
+Salesman == text ==> BDM[Business development manager]
 
-
-Inrement ID-. text .-> Bob's your uncle
-
-First ==> second
-
-Salesman == text ==> Business development manager
 
 flowchart TP
 AM -- updates tag in CW --> B -- Notifies BDM --> BDM
