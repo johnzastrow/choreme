@@ -21,7 +21,9 @@ A-->B
 A --- B
 ```
 #### Does this work now?
+It seems to. Looks like you need to close the mermaid code block for each diagram
 
+```mermaid
 flowchart LR
 C-- This is the text! ---D
 
@@ -31,31 +33,34 @@ E---|This is the text|F
 Cat-->|text|Dog
 
 manager-- text -->worker
+```
 
+```mermaid
 flowchart LR
 Order-.->Ship;
 InrementID-. text .-> BobsUncle
 First ==> second ==> BobsUncle ==>
 Salesman == text ==> BDM[Business development manager]
+```
 
 
-
-
+```mermaid
 flowchart TB
     Cheese --> Bacon
     Cheese --> Lettuce
     Bun --> Bacon
     Bun --> Lettuce
-    
- 
+   ``` 
+ ```mermaid
     graph TD
     A[Christmas] -->|Get money| B(Go shopping)
     B --> C{Let me think}
     C -->|One| D[Laptop]
     C -->|Two| E[iPhone]
     C -->|Three| F[fa:fa-car Car]
-    
+   ``` 
 
+```mermaid
     erDiagram
           CUSTOMER }|..|{ DELIVERY-ADDRESS : has
           CUSTOMER ||--o{ ORDER : places
@@ -65,7 +70,11 @@ flowchart TB
           ORDER ||--|{ ORDER-ITEM : includes
           PRODUCT-CATEGORY ||--|{ PRODUCT : contains
           PRODUCT ||--o{ ORDER-ITEM : "ordered in"
+  ```
   
+### Here's some coloring
+
+  ```mermaid
 graph LR
 
 A & B--> C & D
@@ -79,3 +88,4 @@ end
 subgraph ending
 C & D
 end
+```
