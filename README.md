@@ -20,7 +20,7 @@ A-->B
 
 A --- B
 
-
+flowchart LR
 C-- This is the text! ---D
 
 
@@ -30,7 +30,7 @@ Cat-->|text|Dog
 
 manager-- text -->worker
 
-
+flowchart LR
 Order-.->Ship;
 
 
@@ -40,11 +40,11 @@ First ==> second
 
 Salesman == text ==> Business development manager
 
-
+flowchart TP
 AM -- updates tag in CW --> B -- Notifies BDM --> BDM
 
 
-
+flowchart LR
 Fish --> Fly & Owl--> Horse
 
 
