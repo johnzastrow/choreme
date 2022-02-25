@@ -214,18 +214,19 @@ D
 ```
 
 Default class
-If a class is named default it will be assigned to all classes without specific class definitions. In the exampe below, A, B and C are customized. But C is set to be default.
+If a class is named default it will be assigned to all classes without specific class definitions. In the exampe below, A, B and C are customized. But Default seems to overide the styling
 
 ```
-    classDef default fill:#f9f,stroke:#333,stroke-width:4px;
+    classDef default fill:#f9f,stroke:#333,stroke-width:4px,color:#eee;
 ```
+Example 1 with a default set
 
   ```mermaid
    graph LR
 
     A & B--> C & D
-    classDef default fill:#02114a,stroke:#037c5e,stroke-width:4px;
-    style A fill:#f9f,stroke:#333,stroke-width:px
+    classDef default fill:#02114a,stroke:#037c5e,color:#eee,stroke-width:2px;
+    style A fill:#f9f,stroke:#333,color:red,stroke-width:1px
     style B fill:#bbf,stroke:#f66,stroke-width:2px,color:#fff,stroke-dasharray: 5 5
 
         subgraph beginning
@@ -237,8 +238,27 @@ If a class is named default it will be assigned to all classes without specific 
         end
 ```
 
+Example 2 with no default
 
-Here's more examples.
+  ```mermaid
+   graph LR
+
+    A & B--> C & D
+    style A fill:#f9f,stroke:#333,color:red,stroke-width:1px
+    style B fill:#bbf,stroke:#f66,stroke-width:2px,color:#fff,stroke-dasharray: 5 5
+
+        subgraph beginning
+        A & B
+        end
+
+        subgraph ending
+        C & D
+        end
+```
+
+## More Examples
+
+More diagram types
 
 ```mermaid
 flowchart TB
