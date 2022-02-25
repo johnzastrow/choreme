@@ -107,7 +107,7 @@ flowchart TB
     end
 ```
 
-Why is this broken
+Why is this broken.. it was missing the d on end
 
 ```mermaid
 sequenceDiagram
@@ -121,3 +121,41 @@ sequenceDiagram
         Bob->>Alice: Thanks for asking
     end
  ```
+ ### More testing.
+ 
+ Notice that the page renders slowly due to all the diagrams. That's OK.
+ 
+ 
+ ```mermaid
+stateDiagram-v2
+    [*] --> Active
+state Active {
+        [*] --> NumLockOff
+        NumLockOff --> NumLockOn : EvNumLockPressed
+        NumLockOn --> NumLockOff : EvNumLockPressed
+        --
+        [*] --> CapsLockOff
+        CapsLockOff --> CapsLockOn : EvCapsLockPressed
+        CapsLockOn --> CapsLockOff : EvCapsLockPressed
+        --
+        [*] --> ScrollLockOff
+        ScrollLockOff --> ScrollLockOn : EvScrollLockPressed
+        ScrollLockOn --> ScrollLockOff : EvScrollLockPressed
+    }
+```
+
+# Fun
+These are getting fun now
+
+```mermaid
+journey
+    title My working day
+    section Go to work
+      Make tea: 5: Me
+      Go upstairs: 3: Me
+      Do work: 1: Me, Cat
+    section Go home
+      Go downstairs: 5: Me
+      Sit down: 5: Me
+```
+
