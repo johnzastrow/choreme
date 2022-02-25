@@ -20,6 +20,7 @@ A-->B
 
 A --- B
 
+```mermaid
 flowchart LR
 C-- This is the text! ---D
 
@@ -38,13 +39,14 @@ Salesman == text ==> BDM[Business development manager]
 
 
 
-
+```mermaid
 flowchart TB
     Cheese --> Bacon
     Cheese --> Lettuce
     Bun --> Bacon
     Bun --> Lettuce
     
+    ```mermaid
     graph TD
     A[Christmas] -->|Get money| B(Go shopping)
     B --> C{Let me think}
@@ -52,7 +54,7 @@ flowchart TB
     C -->|Two| E[iPhone]
     C -->|Three| F[fa:fa-car Car]
     
-    
+    ```mermaid
     erDiagram
           CUSTOMER }|..|{ DELIVERY-ADDRESS : has
           CUSTOMER ||--o{ ORDER : places
