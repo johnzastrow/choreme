@@ -3,7 +3,8 @@
 I will extend these in the future for my own reference.
 each diagram needs to be separated in its own code block or it won't render. Then you can put text between the diagrams using normal markdown. 
 
-# A Basic Test
+
+## A Basic Test
 Notice in the code that each element has a unique identifier that is referenced throughout the diagram. See A and B below.
 
 
@@ -19,9 +20,15 @@ flowchart LR
     A-->B
     A --- B
 ```
-#### Does this work now?
-It seems to. Looks like you need to close the mermaid code block for each diagram
 
+## Examples
+
+Most of the examples below come from the sources here, though I likely tweaked them along the way
+* In someone's blog [https://blog.devgenius.io/diagrams-in-your-github-files-with-mermaid-273003d54421]
+* On the official site [https://mermaid-js.github.io/mermaid/#/flowchart]
+* Test the code here, then paste it here between ```mermaid ``` blocks [https://mermaid.live/]
+
+## Another simple one
 ```mermaid
 flowchart LR
   C-- This is the text! ---D
@@ -30,6 +37,8 @@ flowchart LR
   manager-- text -->worker
 ```
 
+## One with more words
+Note that the IDs cannot have spaces in them, but the labels can. Here the ID is BDM in the code, but you see the label "Business development manager"
 ```mermaid
 flowchart LR
   Order-.->Ship;
@@ -38,6 +47,8 @@ flowchart LR
   Salesman == text ==> BDM[Business development manager]
 ```
 
+### Fun with links
+
 
 ```mermaid
 flowchart TB
@@ -45,7 +56,66 @@ flowchart TB
     Cheese --> Lettuce
     Bun --> Bacon
     Bun --> Lettuce
-   ``` 
+    Bun --> d1[(Database)]
+     
+ ```  
+## Line examples
+You can play with line types. There appear to be lots of synonyms.
+
+```mermaid
+flowchart LR
+ A-->B
+ B --- C
+ C-- This is the text! ---D
+  D---|This is the text|F
+  F-->|text|G
+  G-- text -->H
+  H-.->I;
+```
+Breaking to catch my breath
+
+  ```mermaid
+flowchart TB
+  A-. text .-> B
+  B ==> C
+  C == text ==> D
+  D -- text --> E -- text2 --> F
+  F --o G
+    G --x H
+     H <--> I
+ ```  
+ 
+Same one, Left to Right this time
+
+  ```mermaid
+flowchart LR
+  A-. text .-> B
+  B ==> C
+  C == text ==> D
+  D -- text --> E -- text2 --> F
+  F --o G
+    G --x H
+     H <--> I
+ ```  
+ 
+### Minimum length of a link
+Each node in the flowchart is ultimately assigned to a rank in the rendered graph, i.e. to a vertical or horizontal level (depending on the flowchart orientation), based on the nodes to which it is linked. By default, links can span any number of ranks, but you can ask for any link to be longer than the others by adding extra dashes in the link definition.
+
+In the following example, two extra dashes are added in the link from node B to node E, so that it spans two more ranks than regular links:
+
+```mermaid
+flowchart TD
+    A[Start] --> B{Is it?}
+    B -->|Yes| C[OK]
+    C --> D[Rethink]
+    D --> B
+    B ---->|No| E[End]
+ ```
+    
+## Words, and icons. 
+
+I think this uses Fontawesome. Yep, [https://mermaid-js.github.io/mermaid/#/flowchart?id=basic-support-for-fontawesome]
+
  ```mermaid
     graph TD
     A[Christmas] -->|Get money| B(Go shopping)
