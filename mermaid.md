@@ -98,12 +98,44 @@ flowchart LR
      H <--> I
  ```  
  
+ Code for above. The block just removes the word mermaid to show the code in the block
+
+```
+flowchart LR
+  A-. text .-> B
+  B ==> C
+  C == text ==> D
+  D -- text --> E -- text2 --> F
+  F --o G
+  G --x H
+  H <--> I
+ ```  
+ 
 ### Minimum length of a link
 Each node in the flowchart is ultimately assigned to a rank in the rendered graph, i.e. to a vertical or horizontal level (depending on the flowchart orientation), based on the nodes to which it is linked. By default, links can span any number of ranks, but you can ask for any link to be longer than the others by adding extra dashes in the link definition.
 
 In the following example, two extra dashes are added in the link from node B to node E, so that it spans two more ranks than regular links:
 
 ```mermaid
+flowchart TD
+    A[Start] --> B{Is it?}
+    B -->|Yes| C[OK]
+    C --> D[Rethink]
+    D --> B
+    B ---->|No| E[End]
+ ```
+ 
+ Code again. 
+ Here, the objects aliases are displayed as the following:
+ * A becomes Start as a block
+ * B becomes Is It? as a decision diamond
+ * C becomes OK as a block
+ * D becomes Rethink as a block
+ * E becomes End
+ 
+ Notice the extra dashes on the final B?
+ 
+ ```
 flowchart TD
     A[Start] --> B{Is it?}
     B -->|Yes| C[OK]
@@ -293,6 +325,13 @@ sequenceDiagram
  Notice that the page renders slowly due to all the diagrams. That's OK.
  
  
+
+
+# Adanced Charts
+These are getting fun now
+
+#### State Diagram
+
  ```mermaid
 stateDiagram-v2
     [*] --> Active
@@ -311,8 +350,27 @@ state Active {
     }
 ```
 
-# Fun
-These are getting fun now
+Code
+
+```
+stateDiagram-v2
+    [*] --> Active
+state Active {
+        [*] --> NumLockOff
+        NumLockOff --> NumLockOn : EvNumLockPressed
+        NumLockOn --> NumLockOff : EvNumLockPressed
+        --
+        [*] --> CapsLockOff
+        CapsLockOff --> CapsLockOn : EvCapsLockPressed
+        CapsLockOn --> CapsLockOff : EvCapsLockPressed
+        --
+        [*] --> ScrollLockOff
+        ScrollLockOff --> ScrollLockOn : EvScrollLockPressed
+        ScrollLockOn --> ScrollLockOff : EvScrollLockPressed
+    }
+```    
+
+#### Journey Chart
 
 ```mermaid
 journey
@@ -326,7 +384,24 @@ journey
       Sit down: 5: Me
 ```
 
-# GANTT
+code
+
+```
+journey
+    title My working day
+    section Go to work
+      Make tea: 5: Me
+      Go upstairs: 3: Me
+      Do work: 1: Me, Cat
+    section Go home
+      Go downstairs: 5: Me
+      Sit down: 5: Me
+```
+
+#### GANTT
+
+Gantt Chart
+
 ```mermaid
 gantt
     title A Gantt Diagram
@@ -339,7 +414,9 @@ gantt
     another task      : 24d
 ```
 
-# PIE
+#### PIE
+
+Pie Chart
 
 ```mermaid
 pie
@@ -351,7 +428,10 @@ pie
 ```
 
 
-# REQUIREMENT
+#### REQUIREMENT
+
+Requirement Diagram
+
 
 ```mermaid
     requirementDiagram
