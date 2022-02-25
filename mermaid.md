@@ -114,7 +114,7 @@ flowchart TD
     
 ## Words, and icons. 
 
-I think this uses Fontawesome. Yep, [https://mermaid-js.github.io/mermaid/#/flowchart?id=basic-support-for-fontawesome]
+I think this uses Fontawesome. Yep, [https://mermaid-js.github.io/mermaid/#/flowchart?id=basic-support-for-fontawesome]. Nuts doesn't seem to work in Github. The "car" block was supposed to have a car symbol in it.
 
  ```mermaid
     graph TD
@@ -125,34 +125,116 @@ I think this uses Fontawesome. Yep, [https://mermaid-js.github.io/mermaid/#/flow
     C -->|Three| F[fa:fa-car Car]
    ``` 
 
-```mermaid
-    erDiagram
-          CUSTOMER }|..|{ DELIVERY-ADDRESS : has
-          CUSTOMER ||--o{ ORDER : places
-          CUSTOMER ||--o{ INVOICE : "liable for"
-          DELIVERY-ADDRESS ||--o{ ORDER : receives
-          INVOICE ||--|{ ORDER : covers
-          ORDER ||--|{ ORDER-ITEM : includes
-          PRODUCT-CATEGORY ||--|{ PRODUCT : contains
-          PRODUCT ||--o{ ORDER-ITEM : "ordered in"
-  ```
+
   
 ### Here's some coloring
 
+From the docs
+
+#### Styling and classes
+
+##### Styling links
+
+It is possible to style links. For instance you might want to style a link that is going backwards in the flow. As links have no ids in the same way as nodes, some other way of deciding what style the links should be attached to is required. Instead of ids, the order number of when the link was defined in the graph is used. In the example below the style defined in the linkStyle statement will belong to the fourth link in the graph:
+```
+css linkStyle 3 stroke:#ff3,stroke-width:4px,color:red;
+```
+
+##### Styling a node
+It is possible to apply specific styles such as a thicker border or a different background color to a node.
+
+```
+flowchart LR
+    id1(Start)-->id2(Stop)
+    style id1 fill:#f9f,stroke:#333,stroke-width:4px
+    style id2 fill:#bbf,stroke:#f66,stroke-width:2px,color:#fff,stroke-dasharray: 5 5
+ ```
+    
+    
+```mermaid    
+flowchart LR
+ id1(Start)-->id2(Stop)
+ style id1 fill:#f9f,stroke:#333,stroke-width:4px
+ style id2 fill:#bbf,stroke:#f66,stroke-width:2px,color:#fff,stroke-dasharray: 5 5
+ ```
+ 
+#### Classes
+
+More convenient than defining the style every time is to define a class of styles and attach this class to the nodes that should have a different look.
+
+A class definition looks like the example below:
+
+```
+    classDef className fill:#f9f,stroke:#333,stroke-width:4px;
+```    
+    
+Attachment of a class to a node is done as per below:
+
+```
+    class nodeId1 className;
+```    
+    
+It is also possible to attach a class to a list of nodes in one statement:
+```
+    class nodeId1,nodeId2 className;
+```
+
+A shorter form of adding a class is to attach the classname to the node using the :::operator as per below:
+```
+flowchart LR
+    A:::someclass --> B
+    classDef someclass fill:#f96;
+    A
+    B
+```
+
+### CSS Classes
+It is also possible to predefine classes in css styles that can be applied from the graph definition as in the example below:
+
+Example style
+```
+<style>
+    .cssClass > rect{
+        fill:#FF0000;
+        stroke:#FFFF00;
+        stroke-width:4px;
+    }
+</style>
+```
+
+Example definition
+```
+flowchart LR;
+    A-->B[AAA<span>BBB</span>]
+    B-->D
+    class A cssClass
+A
+AAA<span>BBB</span>
+D
+```
+
+Default class
+If a class is named default it will be assigned to all classes without specific class definitions. In the exampe below, A, B and C are customized. But C is set to be default.
+
+```
+    classDef default fill:#f9f,stroke:#333,stroke-width:4px;
+```
+
   ```mermaid
-graph LR
+   graph LR
 
-A & B--> C & D
-style A fill:#f9f,stroke:#333,stroke-width:px
-style B fill:#bbf,stroke:#f66,stroke-width:2px,color:#fff,stroke-dasharray: 5 5
+    A & B--> C & D
+    classDef default fill:#02114a,stroke:#037c5e,stroke-width:4px;
+    style A fill:#f9f,stroke:#333,stroke-width:px
+    style B fill:#bbf,stroke:#f66,stroke-width:2px,color:#fff,stroke-dasharray: 5 5
 
-subgraph beginning
-A & B
-end
+        subgraph beginning
+        A & B
+        end
 
-subgraph ending
-C & D
-end
+        subgraph ending
+        C & D
+        end
 ```
 
 
@@ -309,3 +391,15 @@ test_entity - satisfies -> test_req2
     test_entity3 - verifies -> test_req5
     test_req <- copies - test_entity2
 ```
+## Entity Relationship (ER) Diagram
+```mermaid
+    erDiagram
+          CUSTOMER }|..|{ DELIVERY-ADDRESS : has
+          CUSTOMER ||--o{ ORDER : places
+          CUSTOMER ||--o{ INVOICE : "liable for"
+          DELIVERY-ADDRESS ||--o{ ORDER : receives
+          INVOICE ||--|{ ORDER : covers
+          ORDER ||--|{ ORDER-ITEM : includes
+          PRODUCT-CATEGORY ||--|{ PRODUCT : contains
+          PRODUCT ||--o{ ORDER-ITEM : "ordered in"
+  ```
