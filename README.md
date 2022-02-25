@@ -38,12 +38,6 @@ Salesman == text ==> BDM[Business development manager]
 
 
 
-flowchart LR
-Fish --> Fly & Owl--> Horse
-
-
-Kelly & Tim--> Tina & Todd
-
 
 flowchart TB
     Cheese --> Bacon
@@ -57,4 +51,15 @@ flowchart TB
     C -->|One| D[Laptop]
     C -->|Two| E[iPhone]
     C -->|Three| F[fa:fa-car Car]
+    
+    
+    erDiagram
+          CUSTOMER }|..|{ DELIVERY-ADDRESS : has
+          CUSTOMER ||--o{ ORDER : places
+          CUSTOMER ||--o{ INVOICE : "liable for"
+          DELIVERY-ADDRESS ||--o{ ORDER : receives
+          INVOICE ||--|{ ORDER : covers
+          ORDER ||--|{ ORDER-ITEM : includes
+          PRODUCT-CATEGORY ||--|{ PRODUCT : contains
+          PRODUCT ||--o{ ORDER-ITEM : "ordered in"
   
