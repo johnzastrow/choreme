@@ -1,0 +1,38 @@
+# Caddyfile for ChoreMe reverse proxy
+# Uncomment and modify the domain section for production use
+
+# Development/local setup
+:80 {
+    reverse_proxy choreme:8080
+}
+
+# Production setup (uncomment and modify)
+# choreme.yourdomain.com {
+#     reverse_proxy choreme:8080
+#     
+#     # Enable compression
+#     encode gzip
+#     
+#     # Security headers
+#     header {
+#         # Enable HSTS
+#         Strict-Transport-Security "max-age=31536000; includeSubDomains"
+#         # Prevent MIME sniffing
+#         X-Content-Type-Options "nosniff"
+#         # Prevent clickjacking
+#         X-Frame-Options "SAMEORIGIN"
+#         # XSS Protection
+#         X-XSS-Protection "1; mode=block"
+#         # Referrer Policy
+#         Referrer-Policy "strict-origin-when-cross-origin"
+#     }
+#     
+#     # Rate limiting (optional)
+#     rate_limit {
+#         zone dynamic {
+#             key {remote_host}
+#             events 100
+#             window 1m
+#         }
+#     }
+# }
