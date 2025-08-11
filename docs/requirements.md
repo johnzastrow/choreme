@@ -2052,6 +2052,216 @@ func main() {
 
 Which next step would you like?
 
+> can we shift the architecture to support sqlite, mariadb, and postgresql?
+
+● I'll review the current architecture documentation and suggest improvements to support multiple database backends
+   (SQLite, MariaDB, and PostgreSQL).
+
+● Update Todos
+  ⎿  ☐ Review current architecture documentation
+     ☐ Analyze database-specific features and constraints
+     ☐ Design multi-database abstraction layer
+     ☐ Suggest migration strategy and tooling improvements
+     ☐ Recommend updated project structure
+
+● Read(requirements.md)
+  ⎿  Read 1385 lines (ctrl+r to expand)
+
+● Update Todos
+  ⎿  ☒ Review current architecture documentation
+     ☐ Analyze database-specific features and constraints
+     ☐ Design multi-database abstraction layer
+     ☐ Suggest migration strategy and tooling improvements
+     ☐ Recommend updated project structure
+
+● Yes, absolutely! Here are my recommendations to support SQLite, MariaDB, and PostgreSQL while maintaining the
+  current architecture's integrity:
+
+  Multi-Database Architecture Improvements
+
+● Update Todos
+  ⎿  ☒ Review current architecture documentation
+     ☒ Analyze database-specific features and constraints
+     ☐ Design multi-database abstraction layer
+     ☐ Suggest migration strategy and tooling improvements
+     ☐ Recommend updated project structure
+
+● 1. Database Abstraction Layer
+
+  Replace current approach:
+  // Instead of direct sqlx usage
+  internal/store/postgres/     # Database-specific implementations
+  internal/store/mysql/
+  internal/store/sqlite/
+  internal/store/interface.go  # Common interface
+
+  New structure:
+  internal/store/
+  ├── interface.go           # Store interface definitions
+  ├── migrations/           # Database-agnostic migration system
+  ├── postgres/            # PostgreSQL implementation
+  ├── mysql/              # MariaDB/MySQL implementation
+  ├── sqlite/             # SQLite implementation
+  └── factory.go          # Database factory
+
+  2. Key Schema Adaptations
+
+  Handle database differences:
+
+  // ENUM handling - varies by database
+  type Priority string
+  const (
+      PriorityLow    Priority = "low"
+      PriorityMedium Priority = "medium"
+      PriorityHigh   Priority = "high"
+  )
+
+  // DECIMAL precision - standardize across DBs
+  // Use DECIMAL(10,2) for all monetary values
+  // SQLite: Use NUMERIC, validate in app layer
+  // MariaDB/MySQL: Native DECIMAL support
+  // PostgreSQL: Native NUMERIC support
+
+  Modified schema considerations:
+  - BLOB storage: PostgreSQL (bytea), MySQL (LONGBLOB), SQLite (BLOB)
+  - Auto-increment: SERIAL vs AUTO_INCREMENT vs INTEGER PRIMARY KEY
+  - JSON fields: PostgreSQL (jsonb), MySQL 5.7+ (JSON), SQLite (TEXT with validation)
+
+  3. Migration System Enhancement
+
+● Update Todos
+  ⎿  ☒ Review current architecture documentation
+     ☒ Analyze database-specific features and constraints
+     ☒ Design multi-database abstraction layer
+     ☐ Suggest migration strategy and tooling improvements
+     ☐ Recommend updated project structure
+
+● Replace single PostgreSQL migrations with database-specific versions:
+
+  migrations/
+  ├── postgres/
+  │   ├── 001_create_households.up.sql
+  │   └── 001_create_households.down.sql
+  ├── mysql/
+  │   ├── 001_create_households.up.sql
+  │   └── 001_create_households.down.sql
+  └── sqlite/
+      ├── 001_create_households.up.sql
+      └── 001_create_households.down.sql
+
+  Use golang-migrate with database-specific paths:
+  // Database-aware migration runner
+  func RunMigrations(dbType, connStr string) error {
+      migrationPath := fmt.Sprintf("file://migrations/%s", dbType)
+      // ... golang-migrate logic
+  }
+
+  4. Configuration & Runtime Selection
+
+  Environment-driven database selection:
+  type DatabaseConfig struct {
+      Type   string `env:"DB_TYPE" envDefault:"sqlite"`     // sqlite, mysql, postgres
+      Host   string `env:"DB_HOST" envDefault:"localhost"`
+      Port   int    `env:"DB_PORT" envDefault:"5432"`
+      Name   string `env:"DB_NAME" envDefault:"choreme.db"`
+      User   string `env:"DB_USER"`
+      Pass   string `env:"DB_PASS"`
+      SSLMode string `env:"DB_SSL_MODE" envDefault:"disable"`
+  }
+
+  5. Updated Tech Stack Recommendations
+
+● Update Todos
+  ⎿  ☒ Review current architecture documentation
+     ☒ Analyze database-specific features and constraints
+     ☒ Design multi-database abstraction layer
+     ☒ Suggest migration strategy and tooling improvements
+     ☐ Recommend updated project structure
+
+● Backend Dependencies:
+  // Replace single database driver with multi-driver support
+  require (
+      github.com/lib/pq           v1.10.9  // PostgreSQL
+      github.com/go-sql-driver/mysql v1.7.1  // MySQL/MariaDB
+      github.com/mattn/go-sqlite3 v1.14.17 // SQLite
+      github.com/golang-migrate/migrate/v4 v4.16.2
+      github.com/shopspring/decimal v1.3.1  // Consistent decimal handling
+  )
+
+  Build constraints for optional drivers:
+  //go:build postgres
+  // +build postgres
+
+  //go:build mysql
+  // +build mysql
+
+  //go:build sqlite
+  // +build sqlite
+
+  6. Deployment Flexibility
+
+  SQLite for:
+  - Single-user/small family deployments
+  - Development environments
+  - Edge/embedded devices
+
+  MariaDB/MySQL for:
+  - Traditional LAMP stack deployments
+  - Shared hosting environments
+  - Existing MySQL infrastructure
+
+  PostgreSQL for:
+  - High-concurrency families
+  - Advanced query needs
+  - Production scaling
+
+  7. Recommended Project Structure
+
+● Update Todos
+  ⎿  ☒ Review current architecture documentation
+     ☒ Analyze database-specific features and constraints
+     ☒ Design multi-database abstraction layer
+     ☒ Suggest migration strategy and tooling improvements
+     ☒ Recommend updated project structure
+
+● cmd/choreme/
+  ├── main.go                    # Database type detection & factory
+  internal/
+  ├── config/
+  │   └── database.go           # Multi-DB configuration
+  ├── store/
+  │   ├── interface.go          # Database interface contracts
+  │   ├── factory.go           # Database factory pattern
+  │   ├── postgres/            # PostgreSQL implementation
+  │   ├── mysql/              # MariaDB/MySQL implementation
+  │   ├── sqlite/             # SQLite implementation
+  │   └── migrations/         # Database-specific migrations
+  ├── model/                   # Shared domain models
+  ├── service/                 # Business logic (DB-agnostic)
+  └── api/                    # HTTP handlers
+
+  8. Key Benefits
+
+  - Deployment flexibility: Choose database based on environment
+  - Development ease: SQLite for local development
+  - Production scaling: PostgreSQL for high-load scenarios
+  - Cost optimization: SQLite for small deployments, managed MySQL for medium scale
+  - Migration path: Easy database migration between types
+
+  9. Trade-offs & Considerations
+
+  Limitations to accept:
+  - Feature parity: Some advanced PostgreSQL features unavailable in SQLite
+  - Performance: SQLite concurrent write limitations for large families
+  - Complexity: Additional testing matrix (3x database combinations)
+
+  Mitigation strategies:
+  - Abstract complex queries behind service layer
+  - Document database-specific performance characteristics
+  - Provide clear deployment guidance per database type
+
+  This approach maintains your excellent architecture while providing maximum deployment flexibility. The key is
+  keeping business logic database-agnostic while allowing each database to leverage its strengths.
 
 
 
