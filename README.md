@@ -58,79 +58,202 @@ A complete family chore management system with a **mobile-first Progressive Web 
 - **Input Validation**: Comprehensive request validation
 - **Error Handling**: Graceful failure management
 
-## Quick Start
+## Dependencies & Prerequisites
 
-### Prerequisites
+ChoreMe supports three deployment modes with different dependency requirements:
 
+### Option 1: Go Backend Only (Simple HTML UI)
+**Minimum Requirements:**
 - Go 1.21 or later
-- Node.js 18+ and npm (for PWA frontend)
-- Docker and Docker Compose (optional)
+- Database (SQLite embedded, or MySQL/PostgreSQL)
 
-### Quick Windows Setup with Logging
-
-For Windows users who want to get started quickly with logging enabled:
-
-```cmd
-# 1. Clone and build
+**Quick Start:**
+```bash
 git clone https://github.com/your-org/choreme.git
 cd choreme
 go mod tidy
+go build -o choreme cmd/choreme/main.go
+./choreme
+```
+
+### Option 2: Full PWA Experience (React Frontend + Go Backend) 
+**Requirements:**
+- Go 1.21 or later
+- Node.js 18+ and npm
+- Database (SQLite embedded, or MySQL/PostgreSQL)
+
+**Quick Start:**
+```bash
+# Terminal 1: Backend
+git clone https://github.com/your-org/choreme.git
+cd choreme
+go mod tidy
+go run cmd/choreme/main.go
+
+# Terminal 2: Frontend
+cd web
+npm install
+npm start
+```
+
+### Option 3: Docker Deployment
+**Requirements:**
+- Docker and Docker Compose
+
+**Quick Start:**
+```bash
+git clone https://github.com/your-org/choreme.git
+cd choreme
+docker-compose up choreme
+```
+
+## Quick Start (All Platforms)
+
+### Prerequisites Overview
+
+| Component | Minimum | Recommended | Purpose |
+|-----------|---------|-------------|---------|
+| **Go** | 1.21+ | 1.22+ | Backend API server |
+| **Node.js** | 18+ | 20+ LTS | PWA frontend (optional) |
+| **Database** | SQLite (embedded) | PostgreSQL 15+ | Data storage |
+| **Docker** | 20.10+ | Latest | Containerized deployment |
+| **Memory** | 512MB | 2GB | Application runtime |
+| **Storage** | 100MB | 1GB | Database and logs |
+
+## Build Instructions
+
+ChoreMe provides multiple build options depending on your needs:
+
+### Option 1: Go Backend with Embedded UI
+This builds the backend with an embedded simple HTML UI (no Node.js required):
+
+**Linux/macOS:**
+```bash
+# Clone and setup
+git clone https://github.com/your-org/choreme.git
+cd choreme
+
+# Configure environment
+cp .env.example .env
+# Edit .env as needed
+
+# Build and run
+go mod tidy
+go build -o choreme cmd/choreme/main.go
+./choreme
+```
+
+**Windows:**
+```cmd
+REM Clone and setup
+git clone https://github.com/your-org/choreme.git
+cd choreme
+
+REM Configure environment  
+copy .env.example .env
+REM Edit .env with notepad .env
+
+REM Build and run
+go mod tidy
+go build -o choreme.exe cmd/choreme/main.go
+choreme.exe
+```
+
+### Option 2: Backend + Full React PWA
+This builds both the Go backend and React PWA frontend:
+
+**Linux/macOS:**
+```bash
+# Clone repository
+git clone https://github.com/your-org/choreme.git
+cd choreme
+
+# Build backend
+go mod tidy
+go build -o choreme cmd/choreme/main.go
+
+# Build PWA (in another terminal)
+cd web
+npm install
+npm run build
+
+# The React build will be embedded in the Go binary when you restart
+./choreme
+```
+
+**Windows:**
+```cmd
+REM Clone repository
+git clone https://github.com/your-org/choreme.git
+cd choreme
+
+REM Build backend
+go mod tidy
 go build -o choreme.exe cmd/choreme/main.go
 
-# 2. Setup basic SQLite config
-echo DB_TYPE=sqlite > .env
-echo DB_NAME=choreme.db >> .env
-echo JWT_SECRET=change-this-secret-key-in-production >> .env
-echo GIN_MODE=debug >> .env
+REM Build PWA (in another Command Prompt)
+cd web
+npm install
+npm run build
 
-# 3. Setup logging directory
-mkdir logs
-
-# 4. Run with file logging
-choreme.exe > logs\choreme.log 2>&1
+REM The React build will be embedded in the Go binary when you restart
+choreme.exe
 ```
 
-Then open another Command Prompt to monitor logs:
+### Option 3: Automated Build Scripts
+ChoreMe includes build scripts that automatically handle the React build and embedding:
+
+**Linux:**
+```bash
+# Make script executable
+chmod +x scripts/build-with-ui.sh
+
+# Run automated build
+./scripts/build-with-ui.sh
+
+# Run the application
+./choreme
+```
+
+**Windows:**
 ```cmd
-cd choreme
-powershell Get-Content logs\choreme.log -Wait
+REM Run automated build
+scripts\build-with-ui.bat
+
+REM Run the application
+choreme.exe
 ```
 
-### Prerequisites
+### Build Verification
+After building, verify your installation:
 
-- Go 1.21 or later
-- Docker and Docker Compose (optional)
+```bash
+# Check which UI is active (should show one of these messages):
+# "Embedded React PWA enabled - serving full mobile UI"
+# "Simple HTML UI enabled" 
+# "API documentation mode"
 
-### Local Development
+# Test the API
+curl http://localhost:8080/health
+```
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/your-org/choreme.git
-   cd choreme
-   ```
+### Development Build
+For development with hot reloading:
 
-2. **Set up environment**
-   ```bash
-   cp .env.example .env
-   # Edit .env with your configuration
-   ```
+**Backend (Go):**
+```bash
+# Terminal 1: Run backend with live reload
+go run cmd/choreme/main.go
+```
 
-3. **Install dependencies**
-   ```bash
-   go mod tidy
-   ```
-
-4. **Run database migrations**
-   ```bash
-   make migrate-up
-   ```
-
-5. **Start the application**
-   ```bash
-   make run
-   ```
-
-The API will be available at `http://localhost:8080`
+**Frontend (React):**
+```bash
+# Terminal 2: Run PWA dev server
+cd web
+npm start
+# PWA available at http://localhost:3000
+# API available at http://localhost:8080
+```
 
 ## Complete System Setup (Backend + PWA Frontend)
 

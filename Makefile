@@ -1,9 +1,10 @@
-.PHONY: help build run test clean migrate-up migrate-down docker-build docker-run
+.PHONY: help build build-ui run test clean migrate-up migrate-down docker-build docker-run
 
 # Default target
 help:
 	@echo "Available commands:"
-	@echo "  build        - Build the application"
+	@echo "  build        - Build the API backend only"
+	@echo "  build-ui     - Build with embedded React UI (requires Node.js)"
 	@echo "  run          - Run the application"
 	@echo "  test         - Run tests"
 	@echo "  clean        - Clean build artifacts"
@@ -12,10 +13,15 @@ help:
 	@echo "  docker-build - Build Docker image"
 	@echo "  docker-run   - Run with Docker Compose"
 
-# Build the application
+# Build the application (API only)
 build:
-	@echo "Building ChoreMe..."
+	@echo "Building ChoreMe API backend..."
 	@go build -o bin/choreme cmd/choreme/main.go
+
+# Build with embedded UI
+build-ui:
+	@echo "Building ChoreMe with embedded UI..."
+	@./scripts/build-with-ui.sh
 
 # Run the application
 run:

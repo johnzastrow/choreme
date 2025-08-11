@@ -1,11 +1,14 @@
 package api
 
 import (
+	"log"
+
 	"github.com/choreme/choreme/internal/auth"
 	"github.com/choreme/choreme/internal/config"
 	"github.com/choreme/choreme/internal/middleware"
 	"github.com/choreme/choreme/internal/service"
 	"github.com/choreme/choreme/internal/store"
+	"github.com/choreme/choreme/internal/web"
 	"github.com/gin-gonic/gin"
 )
 
@@ -40,8 +43,8 @@ func (s *Server) setupRoutes() {
 	s.router.Use(middleware.LoggingMiddleware())
 	s.router.Use(middleware.RecoveryMiddleware())
 
-	// Root route
-	s.router.GET("/", s.rootHandler)
+	// Setup web UI serving (embedded React PWA)
+	s.setupWebUI()
 	
 	// Health check
 	s.router.GET("/health", s.healthCheck)
@@ -141,6 +144,38 @@ func (s *Server) setupRoutes() {
 			}
 		}
 	}
+}
+
+func (s *Server) setupWebUI() {
+	// Try to setup embedded React PWA first
+	spaHandler, err := web.NewSPAHandler()
+	if err == nil {
+		log.Println("Embedded React PWA enabled - serving full mobile UI")
+		s.router.NoRoute(gin.WrapH(spaHandler))
+		s.router.GET("/api", s.rootHandler)
+		return
+	}
+
+	log.Printf("React PWA not available (build not found): %v", err)
+	log.Println("Falling back to simple HTML UI")
+	
+	// Fallback to simple HTML UI
+	simpleUI, err := web.NewSimpleUI()
+	if err != nil {
+		log.Printf("Simple UI also not available: %v", err)
+		// Final fallback to API documentation
+		s.router.GET("/", s.rootHandler)
+		return
+	}
+	
+	log.Println("Simple HTML UI enabled")
+	
+	// Setup simple UI routes
+	s.router.GET("/", gin.WrapF(simpleUI.ServeHomePage))
+	s.router.GET("/login", gin.WrapF(simpleUI.ServeLoginPage))
+	
+	// Keep API documentation available at /api
+	s.router.GET("/api", s.rootHandler)
 }
 
 func (s *Server) Run(addr string) error {
