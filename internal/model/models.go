@@ -248,3 +248,43 @@ type PaginatedResponse struct {
 	Total      int         `json:"total"`
 	TotalPages int         `json:"total_pages"`
 }
+
+// Filter types for queries
+type ChoreFilters struct {
+	Status     *AssignmentStatus
+	Category   *string
+	Priority   *Priority
+	CreatedBy  *int
+	DateFrom   *time.Time
+	DateTo     *time.Time
+	Limit      int
+	Offset     int
+}
+
+type AssignmentFilters struct {
+	Status     *AssignmentStatus
+	ChoreID    *int
+	DueBefore  *time.Time
+	DueAfter   *time.Time
+	Completed  *bool
+	Approved   *bool
+	Limit      int
+	Offset     int
+}
+
+type LedgerFilters struct {
+	Type       *LedgerType
+	DateFrom   *time.Time
+	DateTo     *time.Time
+	Limit      int
+	Offset     int
+}
+
+type AuditFilters struct {
+	Action     *string
+	UserID     *int
+	DateFrom   *time.Time
+	DateTo     *time.Time
+	Limit      int
+	Offset     int
+}

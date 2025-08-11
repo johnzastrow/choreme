@@ -34,10 +34,10 @@ func (s *AuditService) LogAction(ctx context.Context, householdID, userID int, a
 	}
 }
 
-func (s *AuditService) GetAuditLogs(ctx context.Context, householdID int, filters store.AuditFilters) ([]*model.AuditLog, error) {
+func (s *AuditService) GetAuditLogs(ctx context.Context, householdID int, filters model.AuditFilters) ([]*model.AuditLog, error) {
 	return s.store.GetAuditLogsByHousehold(ctx, householdID, filters)
 }
 
-func (s *AuditService) GetUserAuditLogs(ctx context.Context, userID int, filters store.AuditFilters) ([]*model.AuditLog, error) {
+func (s *AuditService) GetUserAuditLogs(ctx context.Context, userID int, filters model.AuditFilters) ([]*model.AuditLog, error) {
 	return s.store.GetAuditLogsByUser(ctx, userID, filters)
 }

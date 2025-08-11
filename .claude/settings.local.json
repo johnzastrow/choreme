@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(go mod:*)",
+      "Bash(go build:*)",
+      "Bash(sed:*)",
+      "Bash(grep:*)",
+      "Bash(./choreme)",
+      "Bash(curl:*)",
+      "Bash(echo)",
+      "Bash(go run:*)",
+      "Bash(lsof:*)",
+      "Bash(pkill:*)",
+      "Bash(rm:*)",
+      "Bash(mkdir:*)",
+      "Bash(npm install)",
+      "Bash(npm install:*)",
+      "Bash(npm run build:*)"
+    ],
+    "deny": []
+  }
+}

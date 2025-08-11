@@ -1,0 +1,72 @@
+{
+  "short_name": "ChoreMe",
+  "name": "ChoreMe - Family Chore Manager",
+  "description": "A family-friendly app for managing household chores and tracking earnings",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#0ea5e9",
+  "background_color": "#ffffff",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "categories": ["productivity", "lifestyle"],
+  "prefer_related_applications": false,
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "screenshots": [
+    {
+      "src": "screenshot-narrow.png",
+      "sizes": "400x800",
+      "type": "image/png",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "screenshot-wide.png", 
+      "sizes": "1024x768",
+      "type": "image/png",
+      "form_factor": "wide"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Today's Chores",
+      "short_name": "Today",
+      "description": "View today's assigned chores",
+      "url": "/dashboard?tab=today",
+      "icons": [
+        {
+          "src": "shortcut-today.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Rewards Store",
+      "short_name": "Rewards",
+      "description": "Browse and redeem rewards",
+      "url": "/rewards",
+      "icons": [
+        {
+          "src": "shortcut-rewards.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+  "related_applications": [],
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  }
+}

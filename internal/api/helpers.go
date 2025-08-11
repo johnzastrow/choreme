@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/choreme/choreme/internal/auth"
 	"github.com/choreme/choreme/internal/middleware"
 	"github.com/choreme/choreme/internal/model"
 	"github.com/gin-gonic/gin"
@@ -33,7 +34,7 @@ func (s *Server) getHouseholdID(c *gin.Context) (int, bool) {
 	return householdID, true
 }
 
-func (s *Server) getClaims(c *gin.Context) (*middleware.Claims, bool) {
+func (s *Server) getClaims(c *gin.Context) (*auth.Claims, bool) {
 	claims, ok := middleware.GetClaims(c)
 	if !ok {
 		c.JSON(http.StatusUnauthorized, model.APIResponse{

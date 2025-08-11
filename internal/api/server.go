@@ -40,6 +40,9 @@ func (s *Server) setupRoutes() {
 	s.router.Use(middleware.LoggingMiddleware())
 	s.router.Use(middleware.RecoveryMiddleware())
 
+	// Root route
+	s.router.GET("/", s.rootHandler)
+	
 	// Health check
 	s.router.GET("/health", s.healthCheck)
 

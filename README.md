@@ -1,23 +1,100 @@
 # ChoreMe - Family Chore Management System
 
-A comprehensive family chore management application with support for multiple database backends (SQLite, MySQL/MariaDB, PostgreSQL).
+A complete family chore management system with a **mobile-first Progressive Web App** and backend API supporting multiple database backends (SQLite, MySQL/MariaDB, PostgreSQL).
+
+## 📱 Mobile App Experience
+
+**✨ Install like a native app** - Add to your phone's home screen for a complete app experience  
+**📷 Built-in camera** - Take photos directly in the app as proof of chore completion  
+**🔄 Works offline** - Complete chores without internet, syncs automatically when reconnected  
+**🔔 Smart notifications** - Get reminders for due chores and updates on earnings  
+**💰 Real-time earnings** - See your balance update instantly when chores are approved  
+**👨‍👩‍👧‍👦 Family-focused** - Each family member has their own secure view and data
 
 ## Features
 
+### 📱 Mobile Progressive Web App
+- **Mobile-First Design**: Touch-optimized interface with native app experience
+- **PWA Ready**: Installable on home screen with offline support
+- **Responsive UI**: Works perfectly on phones, tablets, and desktops
+- **Camera Integration**: Built-in photo capture for chore proof
+- **Push Notifications**: Real-time reminders and status updates
+- **Offline-First**: Works without internet, syncs when reconnected
+- **Background Sync**: Automatic data synchronization when online
+- **App-like Experience**: Standalone display mode, bottom navigation
+
+### 🔧 Backend API System
 - **Multi-Database Support**: Choose between SQLite, MySQL/MariaDB, or PostgreSQL
-- **Family Management**: Household-based organization with invite codes
+- **RESTful API**: 29+ endpoints with comprehensive functionality
+- **JWT Authentication**: Secure token-based authentication
 - **Role-Based Access**: System admin, admin, manager, worker, and observer roles
-- **Chore Management**: Create, assign, and track chores with due dates and values
-- **Partial Completion**: Support for percentage-based chore completion
-- **Photo Proof**: Upload and compress images as proof of completion
-- **Earnings System**: Track points/money with decimal precision
-- **Reward Store**: Create and redeem rewards
-- **Audit Trail**: Complete logging of all actions
-- **Late Penalties**: Configurable percentage reductions for overdue chores
-- **Recurring Chores**: Daily, weekly, monthly, or custom patterns
-- **Offline Support**: PWA capabilities with sync conflict resolution
+- **Auto-scaling Architecture**: Database abstraction supports growth
+
+### 🏠 Family Management
+- **Household Organization**: Multi-family support with invite codes
+- **User Roles**: Granular permissions for different family members
+- **Privacy Controls**: Workers only see their own chores and earnings
+- **Invite System**: Secure family member onboarding
+
+### ✅ Chore Management
+- **Smart Assignment**: Assign chores to multiple family members
+- **Progress Tracking**: Percentage-based completion monitoring
+- **Due Date Management**: Automatic late penalty calculations
+- **Photo Proof**: Camera integration with automatic image compression
+- **Recurring Patterns**: Daily, weekly, monthly, or custom schedules
+- **Auto-approval**: Configurable trust system for experienced workers
+
+### 💰 Earnings & Rewards
+- **Decimal Precision**: Accurate monetary tracking with shopspring/decimal
+- **Complete Ledger**: Full transaction history and audit trail
+- **Reward Store**: Family-customizable reward redemption system
+- **Balance Tracking**: Real-time earnings and spending visibility
+- **Manual Adjustments**: Admin controls for special circumstances
+
+### 🔒 Security & Compliance
+- **Audit Trail**: Complete logging of all user actions
+- **Data Encryption**: JWT tokens and password hashing
+- **CORS Protection**: Configurable cross-origin security
+- **Input Validation**: Comprehensive request validation
+- **Error Handling**: Graceful failure management
 
 ## Quick Start
+
+### Prerequisites
+
+- Go 1.21 or later
+- Node.js 18+ and npm (for PWA frontend)
+- Docker and Docker Compose (optional)
+
+### Quick Windows Setup with Logging
+
+For Windows users who want to get started quickly with logging enabled:
+
+```cmd
+# 1. Clone and build
+git clone https://github.com/your-org/choreme.git
+cd choreme
+go mod tidy
+go build -o choreme.exe cmd/choreme/main.go
+
+# 2. Setup basic SQLite config
+echo DB_TYPE=sqlite > .env
+echo DB_NAME=choreme.db >> .env
+echo JWT_SECRET=change-this-secret-key-in-production >> .env
+echo GIN_MODE=debug >> .env
+
+# 3. Setup logging directory
+mkdir logs
+
+# 4. Run with file logging
+choreme.exe > logs\choreme.log 2>&1
+```
+
+Then open another Command Prompt to monitor logs:
+```cmd
+cd choreme
+powershell Get-Content logs\choreme.log -Wait
+```
 
 ### Prerequisites
 
@@ -54,6 +131,57 @@ A comprehensive family chore management application with support for multiple da
    ```
 
 The API will be available at `http://localhost:8080`
+
+## Complete System Setup (Backend + PWA Frontend)
+
+For the full ChoreMe experience with both API backend and mobile PWA:
+
+### 1. Backend Setup
+```bash
+# Clone and setup backend
+git clone https://github.com/your-org/choreme.git
+cd choreme
+
+# Configure environment
+cp .env.example .env
+# Edit .env with your database settings
+
+# Install dependencies and run migrations
+go mod tidy
+make migrate-up
+
+# Start the API server
+make run
+```
+
+### 2. PWA Frontend Setup
+```bash
+# In a new terminal, setup the frontend
+cd web
+cp .env.example .env
+
+# Install dependencies
+npm install
+
+# Start the development server
+npm start
+```
+
+The complete system will be available at:
+- **API Backend**: `http://localhost:8080`
+- **PWA Frontend**: `http://localhost:3000`
+- **PWA Production**: After `npm run build`, serve from `web/build/`
+
+### 3. Production PWA Build
+```bash
+cd web
+npm run build
+
+# Serve the built PWA (example with serve)
+npx serve -s build -l 3000
+```
+
+The PWA can be installed on mobile devices and desktops for an app-like experience.
 
 ### Docker Deployment
 
@@ -254,6 +382,124 @@ If accessing from other devices on your network:
 netsh advfirewall firewall add rule name="ChoreMe" dir=in action=allow protocol=TCP localport=8080
 ```
 
+### Running with Enhanced Logging on Windows
+
+For development and troubleshooting, you can run ChoreMe with enhanced logging:
+
+#### Method 1: Run with Detailed Console Logging
+```cmd
+# Set environment variable for detailed logging
+set GIN_MODE=debug
+
+# Run with logging output to console
+choreme.exe
+```
+
+#### Method 2: Run with File Logging
+```cmd
+# Create logs directory
+mkdir C:\choreme\logs
+
+# Run with output redirected to log file (with timestamp)
+echo Starting ChoreMe at %date% %time% >> C:\choreme\logs\choreme.log
+choreme.exe >> C:\choreme\logs\choreme.log 2>&1
+
+# To view logs in real-time (open new Command Prompt)
+powershell Get-Content C:\choreme\logs\choreme.log -Wait
+```
+
+#### Method 3: Run with PowerShell and Timestamped Logs
+```powershell
+# In PowerShell
+$logFile = "C:\choreme\logs\choreme-$(Get-Date -Format 'yyyyMMdd-HHmmss').log"
+Write-Output "Starting ChoreMe with logging to: $logFile"
+.\choreme.exe *>&1 | ForEach-Object { "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss'): $_" } | Tee-Object -FilePath $logFile
+```
+
+#### Method 4: Using Windows Event Logging (Advanced)
+For production environments, you can configure ChoreMe to log to Windows Event Log:
+
+1. **Run as Administrator** and register event source:
+```cmd
+# Register ChoreMe as event source (run once as admin)
+eventcreate /ID 1 /L APPLICATION /T INFORMATION /SO "ChoreMe" /D "ChoreMe service started"
+```
+
+2. **Configure logging in `.env`**:
+```env
+# Add to your .env file
+LOG_LEVEL=info
+LOG_FORMAT=json
+LOG_OUTPUT=eventlog
+```
+
+#### Viewing Logs
+
+**Console Logs:**
+- Real-time output appears in Command Prompt
+- Useful for development and immediate debugging
+
+**File Logs:**
+```cmd
+# View latest log entries
+powershell Get-Content C:\choreme\logs\choreme.log -Tail 50
+
+# Search for errors
+findstr "ERROR" C:\choreme\logs\choreme.log
+
+# Monitor logs in real-time
+powershell Get-Content C:\choreme\logs\choreme.log -Wait -Tail 10
+```
+
+**Event Logs:**
+1. Open Event Viewer (`eventvwr.msc`)
+2. Navigate to Windows Logs → Application
+3. Filter by Source: "ChoreMe"
+
+#### Log Rotation for Long-Running Services
+
+For production use, implement log rotation to manage disk space:
+
+```cmd
+# Create a simple log rotation batch file (rotate-logs.bat)
+@echo off
+set LOG_DIR=C:\choreme\logs
+set MAX_SIZE=10485760
+
+for %%f in ("%LOG_DIR%\choreme.log") do (
+    if %%~zf GTR %MAX_SIZE% (
+        move "%%f" "%LOG_DIR%\choreme-%date:~-4,4%%date:~-7,2%%date:~-10,2%.log"
+        echo. > "%%f"
+    )
+)
+```
+
+Schedule this script to run daily using Windows Task Scheduler.
+
+#### Debugging Specific Issues
+
+**Database Connection Issues:**
+```cmd
+# Run with database debug logging
+set DB_DEBUG=true
+choreme.exe
+```
+
+**API Request Debugging:**
+```cmd
+# Enable HTTP request logging
+set GIN_MODE=debug
+set HTTP_LOG=true
+choreme.exe
+```
+
+**Performance Monitoring:**
+```cmd
+# Run with performance metrics
+set ENABLE_METRICS=true
+choreme.exe
+```
+
 ### Troubleshooting Windows Deployment
 
 #### Database Connection Issues
@@ -443,28 +689,72 @@ Content-Type: application/json
 
 ## Architecture
 
+ChoreMe follows a **modern three-layer architecture** with a mobile-first PWA frontend and a multi-database backend API.
+
+### System Overview
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    ChoreMe System                           │
+├─────────────────────────────────────────────────────────────┤
+│  📱 PWA Frontend (React + TypeScript)                      │
+│  • Mobile-first responsive UI                              │
+│  • Offline-capable with service workers                    │
+│  • IndexedDB for local storage                             │
+│  • Camera integration & push notifications                 │
+├─────────────────────────────────────────────────────────────┤
+│  🔗 REST API Layer (Go + Gin)                             │
+│  • JWT authentication & role-based access                  │
+│  • 29+ endpoints with comprehensive functionality          │
+│  • CORS middleware & request validation                    │
+│  • Audit logging & error handling                          │
+├─────────────────────────────────────────────────────────────┤
+│  💾 Database Layer (Multi-backend)                        │
+│  • SQLite (embedded) / MySQL / PostgreSQL                  │
+│  • Database abstraction with factory pattern               │
+│  • Automatic migrations & connection pooling               │
+│  • Decimal precision for monetary values                   │
+└─────────────────────────────────────────────────────────────┘
+```
+
 ### Project Structure
 ```
-cmd/
-├── choreme/           # Main application
-└── migrate/           # Migration tool
-internal/
-├── api/              # HTTP handlers
-├── auth/             # JWT and password handling
-├── config/           # Configuration management
-├── middleware/       # HTTP middleware
-├── model/            # Domain models
-├── service/          # Business logic
-└── store/            # Database abstraction
-    ├── interface.go  # Store interface
-    ├── factory.go    # Database factory
-    ├── postgres/     # PostgreSQL implementation
-    ├── mysql/        # MySQL implementation
-    └── sqlite/       # SQLite implementation
-migrations/
-├── postgres/         # PostgreSQL migrations
-├── mysql/           # MySQL migrations
-└── sqlite/          # SQLite migrations
+choreme/
+├── cmd/                    # Application entry points
+│   ├── choreme/           # Main API server
+│   └── migrate/           # Database migration tool
+├── internal/              # Backend Go code
+│   ├── api/              # HTTP handlers & routing
+│   ├── auth/             # JWT & password management
+│   ├── config/           # Configuration management
+│   ├── middleware/       # HTTP middleware (CORS, auth, logging)
+│   ├── model/            # Domain models & types
+│   ├── service/          # Business logic layer
+│   └── store/            # Database abstraction layer
+│       ├── interface.go  # Store interface definition
+│       ├── factory.go    # Database factory pattern
+│       ├── postgres/     # PostgreSQL implementation
+│       ├── mysql/        # MySQL/MariaDB implementation
+│       └── sqlite/       # SQLite implementation
+├── migrations/            # Database migration files
+│   ├── postgres/         # PostgreSQL-specific migrations
+│   ├── mysql/           # MySQL-specific migrations
+│   └── sqlite/          # SQLite-specific migrations
+├── web/                   # PWA Frontend (React)
+│   ├── public/           # Static assets & PWA manifest
+│   │   ├── manifest.json # PWA configuration
+│   │   ├── sw.js        # Service worker for offline support
+│   │   └── index.html   # App shell
+│   └── src/              # React TypeScript source
+│       ├── components/   # Reusable UI components
+│       ├── pages/       # Main application screens
+│       ├── hooks/       # Custom React hooks (useAuth, etc.)
+│       ├── services/    # API client & offline sync
+│       ├── types/       # TypeScript type definitions
+│       └── utils/       # Helper functions
+├── docker-compose.yml     # Multi-database deployment
+├── Dockerfile            # Container definition
+├── Makefile             # Development commands
+└── README.md            # This file
 ```
 
 ### Key Design Decisions
@@ -519,23 +809,102 @@ migrations/sqlite/002_new_feature.down.sql
 
 ## Deployment
 
+### Complete System Deployment
+
+ChoreMe consists of two main components that work together:
+
+#### 1. Backend API Deployment
+
+**Database Choice**:
+- **SQLite**: Perfect for single families, embedded database, minimal setup
+- **MySQL/MariaDB**: Great for traditional web hosting, moderate scale
+- **PostgreSQL**: Best for high-concurrency, advanced features, large families
+
+**Security Configuration**:
+```env
+# Production .env example
+DB_TYPE=postgres
+JWT_SECRET=your-very-secure-random-key-change-this
+HOST=0.0.0.0
+PORT=8080
+GIN_MODE=release
+CORS_ORIGINS=https://your-pwa-domain.com
+```
+
+#### 2. PWA Frontend Deployment
+
+**Static Hosting Options**:
+- **Netlify** (Recommended) - Automatic HTTPS, easy deployment
+- **Vercel** - Excellent performance and CDN
+- **GitHub Pages** - Free for public repos
+- **AWS S3 + CloudFront** - Enterprise-scale hosting
+
+**PWA Deployment Steps**:
+```bash
+# Build production PWA
+cd web
+npm run build
+
+# Deploy to Netlify (example)
+# 1. Connect GitHub repo to Netlify
+# 2. Set build command: npm run build
+# 3. Set publish directory: web/build
+# 4. Add environment variable: REACT_APP_API_URL=https://your-api-domain.com/api/v1
+```
+
+**PWA Configuration**:
+```env
+# web/.env production
+REACT_APP_API_URL=https://your-api-domain.com/api/v1
+REACT_APP_VAPID_PUBLIC_KEY=your-push-notification-key
+```
+
 ### Production Considerations
 
-1. **Database Choice**:
-   - SQLite: Single-family, simple deployment
-   - MySQL: Traditional web hosting, moderate scale
-   - PostgreSQL: High-concurrency, advanced features
+#### Backend Security
+- Change default JWT secret to a secure random key
+- Use environment variables for all secrets
+- Enable HTTPS with SSL certificates (required for PWA)
+- Configure CORS with your PWA domain only
+- Set up database connection pooling
+- Enable audit logging and monitoring
 
-2. **Security**:
-   - Change default JWT secret
-   - Use environment variables for secrets
-   - Enable HTTPS in production
-   - Configure proper CORS origins
+#### PWA Requirements
+- **HTTPS Required** - PWAs require secure origins for all features
+- **Service Worker** - Automatically configured for offline support
+- **Manifest** - App installation metadata included
+- **Icons** - Generate app icons for different platforms
 
-3. **Performance**:
-   - Set appropriate database connection limits
-   - Configure image compression settings
-   - Monitor storage usage for image uploads
+#### Performance Optimization
+- Backend: Connection pooling, image compression limits, caching headers
+- PWA: Code splitting, lazy loading, service worker caching
+- Database: Proper indexing, query optimization
+- CDN: Use CDN for PWA static assets
+
+### Docker Production Deployment
+
+For complete system deployment with Docker:
+
+```bash
+# Backend with PostgreSQL
+docker-compose --profile postgres up -d
+
+# Serve PWA (build first)
+cd web && npm run build
+docker run -p 3000:80 -v $(pwd)/build:/usr/share/nginx/html nginx
+```
+
+### Monitoring and Maintenance
+
+**Health Checks**:
+- Backend: `GET /health` endpoint
+- PWA: Service worker status, offline capability
+- Database: Connection monitoring, query performance
+
+**Backup Strategy**:
+- SQLite: File-based backup of .db file
+- PostgreSQL/MySQL: Regular database dumps
+- PWA: Static assets in version control
 
 ### Environment Variables
 
@@ -561,14 +930,39 @@ For issues and questions:
 - Check the documentation in `/docs`
 - Review the API specification
 
-## Roadmap
+## Current Status & Roadmap
 
-- [ ] Web UI (React PWA)
-- [ ] Mobile app (React Native)
-- [ ] Push notifications
-- [ ] Email notifications
-- [ ] Recurring chore automation
-- [ ] Advanced reporting
-- [ ] Multi-language support
-- [ ] API rate limiting
-- [ ] Backup/restore functionality
+### ✅ Completed Features
+- ✅ **Multi-Database Backend** - SQLite, MySQL, PostgreSQL support with abstraction layer
+- ✅ **RESTful API** - 29+ endpoints with JWT authentication and role-based access
+- ✅ **Mobile PWA Frontend** - React + TypeScript with offline-first architecture
+- ✅ **Authentication System** - Login, registration, household management with invite codes
+- ✅ **Chore Management** - Assignment, progress tracking, photo proof, completion workflows
+- ✅ **Earnings System** - Decimal-precision ledger with transaction history
+- ✅ **Reward Store** - Creation, redemption, and approval system
+- ✅ **Offline Support** - Service workers, IndexedDB storage, background sync
+- ✅ **Push Notifications** - Web push with service worker integration
+- ✅ **Camera Integration** - Photo capture with automatic compression
+- ✅ **PWA Features** - Installable app with app-like experience
+- ✅ **Responsive Design** - Mobile-first UI that works on all screen sizes
+- ✅ **Real-time Updates** - Live chore status and earnings synchronization
+
+### 🚧 Future Enhancements
+- [ ] **Advanced Reporting** - Analytics dashboard for parents
+- [ ] **Email Notifications** - SMTP integration for external notifications  
+- [ ] **Recurring Chore Automation** - Smart scheduling and auto-assignment
+- [ ] **Multi-language Support** - Internationalization (i18n)
+- [ ] **API Rate Limiting** - Protection against abuse
+- [ ] **Backup/Restore** - Data export and import functionality
+- [ ] **Native Mobile Apps** - React Native iOS/Android apps
+- [ ] **Family Calendar Integration** - Sync with Google Calendar, iCal
+- [ ] **Gamification Features** - Badges, streaks, leaderboards
+- [ ] **Voice Commands** - Integration with smart home devices
+
+### 🎯 Production Ready
+ChoreMe is **production-ready** for families wanting a comprehensive chore management system with:
+- Complete mobile app experience (PWA)
+- Full backend API with multi-database support  
+- Offline functionality and data synchronization
+- Photo proof and earnings tracking
+- Secure authentication and role management

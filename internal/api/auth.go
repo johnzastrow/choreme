@@ -5,7 +5,6 @@ import (
 	"encoding/hex"
 	"net/http"
 
-	"github.com/choreme/choreme/internal/auth"
 	"github.com/choreme/choreme/internal/model"
 	"github.com/gin-gonic/gin"
 )
@@ -161,6 +160,23 @@ func (s *Server) generateInvite(c *gin.Context) {
 		Success: true,
 		Data: gin.H{
 			"invite_code": inviteCode,
+		},
+	})
+}
+
+func (s *Server) rootHandler(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{
+		"service": "ChoreMe API",
+		"version": "v1.0.0",
+		"status": "running",
+		"endpoints": gin.H{
+			"health": "/health",
+			"api": "/api/v1",
+			"docs": gin.H{
+				"register": "POST /api/v1/auth/register",
+				"login": "POST /api/v1/auth/login", 
+				"health": "GET /health",
+			},
 		},
 	})
 }
