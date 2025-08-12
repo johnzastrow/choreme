@@ -64,7 +64,7 @@ ChoreMe supports three deployment modes with different dependency requirements:
 
 ### Option 1: Go Backend Only (Simple HTML UI)
 **Minimum Requirements:**
-- Go 1.21 or later
+- Go 1.22 or later
 - Database (SQLite embedded, or MySQL/PostgreSQL)
 
 **Quick Start:**
@@ -78,7 +78,7 @@ go build -o choreme cmd/choreme/main.go
 
 ### Option 2: Full PWA Experience (React Frontend + Go Backend) 
 **Requirements:**
-- Go 1.21 or later
+- Go 1.22 or later
 - Node.js 18+ and npm
 - Database (SQLite embedded, or MySQL/PostgreSQL)
 
@@ -113,9 +113,9 @@ docker-compose up choreme
 
 | Component | Minimum | Recommended | Purpose |
 |-----------|---------|-------------|---------|
-| **Go** | 1.21+ | 1.22+ | Backend API server |
-| **Node.js** | 18+ | 20+ LTS | PWA frontend (optional) |
-| **Database** | SQLite (embedded) | PostgreSQL 15+ | Data storage |
+| **Go** | 1.22+ | 1.22+ | Backend API server |
+| **Node.js** | 18+ | 22+ LTS | PWA frontend (optional) |
+| **Database** | SQLite (embedded) | PostgreSQL 17+ | Data storage |
 | **Docker** | 20.10+ | Latest | Containerized deployment |
 | **Memory** | 512MB | 2GB | Application runtime |
 | **Storage** | 100MB | 1GB | Database and logs |
@@ -255,435 +255,444 @@ npm start
 # API available at http://localhost:8080
 ```
 
-## Complete System Setup (Backend + PWA Frontend)
+## Deployment Instructions
 
-For the full ChoreMe experience with both API backend and mobile PWA:
+### Linux Deployment
 
-### 1. Backend Setup
+#### Method 1: Systemd Service (Recommended)
+
+**1. Build and Install:**
 ```bash
-# Clone and setup backend
+# Build application
+git clone https://github.com/your-org/choreme.git
+cd choreme
+go mod tidy
+go build -o choreme cmd/choreme/main.go
+
+# Create application directory
+sudo mkdir -p /opt/choreme
+sudo cp choreme /opt/choreme/
+sudo cp -r migrations /opt/choreme/
+
+# Create data directory
+sudo mkdir -p /var/lib/choreme
+sudo chown choreme:choreme /var/lib/choreme
+```
+
+**2. Create System User:**
+```bash
+sudo useradd --system --home /var/lib/choreme --shell /bin/false choreme
+```
+
+**3. Configure Environment:**
+```bash
+sudo tee /opt/choreme/.env > /dev/null <<EOF
+DB_TYPE=sqlite
+DB_NAME=/var/lib/choreme/choreme.db
+JWT_SECRET=$(openssl rand -base64 32)
+HOST=0.0.0.0
+PORT=8080
+GIN_MODE=release
+EOF
+
+sudo chown choreme:choreme /opt/choreme/.env
+sudo chmod 600 /opt/choreme/.env
+```
+
+**4. Create Systemd Service:**
+```bash
+sudo tee /etc/systemd/system/choreme.service > /dev/null <<EOF
+[Unit]
+Description=ChoreMe Family Chore Management
+After=network.target
+
+[Service]
+Type=simple
+User=choreme
+Group=choreme
+WorkingDirectory=/opt/choreme
+ExecStart=/opt/choreme/choreme
+Restart=always
+RestartSec=5
+Environment=HOME=/var/lib/choreme
+
+# Security settings
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/var/lib/choreme
+PrivateTmp=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=choreme
+
+[Install]
+WantedBy=multi-user.target
+EOF
+```
+
+**5. Enable and Start Service:**
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable choreme
+sudo systemctl start choreme
+
+# Check status
+sudo systemctl status choreme
+
+# View logs
+sudo journalctl -u choreme -f
+```
+
+#### Method 2: Docker on Linux
+
+**1. Using Docker Compose:**
+```bash
 git clone https://github.com/your-org/choreme.git
 cd choreme
 
-# Configure environment
-cp .env.example .env
-# Edit .env with your database settings
+# Create production docker-compose.override.yml
+cat > docker-compose.override.yml <<EOF
+services:
+  choreme:
+    environment:
+      - DB_TYPE=sqlite
+      - JWT_SECRET=$(openssl rand -base64 32)
+      - GIN_MODE=release
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+EOF
 
-# Install dependencies and run migrations
-go mod tidy
-make migrate-up
-
-# Start the API server
-make run
+docker-compose up -d choreme
 ```
 
-### 2. PWA Frontend Setup
+**2. With PostgreSQL:**
 ```bash
-# In a new terminal, setup the frontend
-cd web
-cp .env.example .env
-
-# Install dependencies
-npm install
-
-# Start the development server
-npm start
+docker-compose --profile postgres up -d
 ```
 
-The complete system will be available at:
-- **API Backend**: `http://localhost:8080`
-- **PWA Frontend**: `http://localhost:3000`
-- **PWA Production**: After `npm run build`, serve from `web/build/`
-
-### 3. Production PWA Build
+**3. With Reverse Proxy (SSL):**
 ```bash
-cd web
-npm run build
+# Edit Caddyfile with your domain
+echo "your-domain.com {
+    reverse_proxy choreme:8080
+}" > Caddyfile
 
-# Serve the built PWA (example with serve)
-npx serve -s build -l 3000
+docker-compose --profile proxy up -d
 ```
 
-The PWA can be installed on mobile devices and desktops for an app-like experience.
+#### Linux Logging Configuration
 
-### Docker Deployment
-
-#### SQLite (Simplest)
+**Systemd Journal (Default):**
 ```bash
+# View real-time logs
+sudo journalctl -u choreme -f
+
+# View logs with timestamps
+sudo journalctl -u choreme --since "1 hour ago"
+
+# Export logs to file
+sudo journalctl -u choreme --since "today" > choreme-logs.txt
+```
+
+**File-based Logging:**
+```bash
+# Create log directory
+sudo mkdir -p /var/log/choreme
+sudo chown choreme:choreme /var/log/choreme
+
+# Update .env
+echo "LOG_FILE=/var/log/choreme/choreme.log" | sudo tee -a /opt/choreme/.env
+
+# Set up log rotation
+sudo tee /etc/logrotate.d/choreme > /dev/null <<EOF
+/var/log/choreme/*.log {
+    daily
+    rotate 30
+    compress
+    delaycompress
+    missingok
+    notifempty
+    create 644 choreme choreme
+    postrotate
+        systemctl reload choreme
+    endscript
+}
+EOF
+```
+
+### Windows Deployment
+
+#### Method 1: Windows Service (Recommended)
+
+**1. Build and Install:**
+```cmd
+REM Create application directory
+mkdir C:\Program Files\ChoreMe
+cd /d "C:\Program Files\ChoreMe"
+
+REM Download and extract (or build locally)
+git clone https://github.com/your-org/choreme.git temp
+cd temp
+go build -o choreme.exe cmd/choreme/main.go
+copy choreme.exe "C:\Program Files\ChoreMe\"
+xcopy migrations "C:\Program Files\ChoreMe\migrations\" /E /I
+cd ..
+rmdir temp /s /q
+```
+
+**2. Configure Environment:**
+```cmd
+REM Create data directory
+mkdir C:\ProgramData\ChoreMe
+mkdir C:\ProgramData\ChoreMe\logs
+
+REM Create .env file
+echo DB_TYPE=sqlite > "C:\Program Files\ChoreMe\.env"
+echo DB_NAME=C:\ProgramData\ChoreMe\choreme.db >> "C:\Program Files\ChoreMe\.env"
+echo JWT_SECRET=your-secure-random-key-change-this >> "C:\Program Files\ChoreMe\.env"
+echo HOST=0.0.0.0 >> "C:\Program Files\ChoreMe\.env"
+echo PORT=8080 >> "C:\Program Files\ChoreMe\.env"
+echo GIN_MODE=release >> "C:\Program Files\ChoreMe\.env"
+echo LOG_FILE=C:\ProgramData\ChoreMe\logs\choreme.log >> "C:\Program Files\ChoreMe\.env"
+```
+
+**3. Install as Windows Service using NSSM:**
+```cmd
+REM Download NSSM from https://nssm.cc/download
+REM Extract to C:\nssm
+
+REM Install service (run as Administrator)
+C:\nssm\nssm.exe install ChoreMe "C:\Program Files\ChoreMe\choreme.exe"
+C:\nssm\nssm.exe set ChoreMe AppDirectory "C:\Program Files\ChoreMe"
+C:\nssm\nssm.exe set ChoreMe DisplayName "ChoreMe Family Chore Management"
+C:\nssm\nssm.exe set ChoreMe Description "Family chore management system with mobile PWA"
+C:\nssm\nssm.exe set ChoreMe Start SERVICE_AUTO_START
+
+REM Configure logging
+C:\nssm\nssm.exe set ChoreMe AppStdout C:\ProgramData\ChoreMe\logs\choreme-out.log
+C:\nssm\nssm.exe set ChoreMe AppStderr C:\ProgramData\ChoreMe\logs\choreme-err.log
+
+REM Start service
+C:\nssm\nssm.exe start ChoreMe
+
+REM Check status
+sc query ChoreMe
+```
+
+**4. Firewall Configuration:**
+```cmd
+REM Allow through Windows Firewall (run as Administrator)
+netsh advfirewall firewall add rule name="ChoreMe" dir=in action=allow protocol=TCP localport=8080 profile=any
+```
+
+#### Method 2: PowerShell Deployment Script
+
+Create a deployment script `deploy-windows.ps1`:
+
+```powershell
+# Check if running as Administrator
+if (-NOT ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator"))
+{
+    Write-Error "This script requires Administrator privileges"
+    exit 1
+}
+
+# Configuration
+$AppDir = "C:\Program Files\ChoreMe"
+$DataDir = "C:\ProgramData\ChoreMe"
+$ServiceName = "ChoreMe"
+
+# Create directories
+New-Item -ItemType Directory -Path $AppDir -Force
+New-Item -ItemType Directory -Path "$DataDir\logs" -Force
+
+# Build application
+go build -o "$AppDir\choreme.exe" cmd/choreme/main.go
+
+# Copy migrations
+Copy-Item -Path "migrations" -Destination $AppDir -Recurse -Force
+
+# Generate secure JWT secret
+$JWTSecret = [System.Web.Security.Membership]::GeneratePassword(32, 0)
+
+# Create .env file
+@"
+DB_TYPE=sqlite
+DB_NAME=$DataDir\choreme.db
+JWT_SECRET=$JWTSecret
+HOST=0.0.0.0
+PORT=8080
+GIN_MODE=release
+LOG_FILE=$DataDir\logs\choreme.log
+"@ | Out-File -FilePath "$AppDir\.env" -Encoding UTF8
+
+Write-Output "ChoreMe deployed to $AppDir"
+Write-Output "Data directory: $DataDir"
+Write-Output "Configure as Windows Service using NSSM or sc.exe"
+```
+
+Run the deployment:
+```powershell
+# Run as Administrator
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
+.\deploy-windows.ps1
+```
+
+#### Windows Logging Configuration
+
+**Method 1: File-based Logging (Configured Above)**
+```cmd
+REM View logs
+type "C:\ProgramData\ChoreMe\logs\choreme.log"
+
+REM Monitor logs in real-time (PowerShell)
+Get-Content "C:\ProgramData\ChoreMe\logs\choreme.log" -Wait -Tail 20
+
+REM Search for errors
+findstr "ERROR" "C:\ProgramData\ChoreMe\logs\choreme.log"
+```
+
+**Method 2: Windows Event Log Integration**
+```cmd
+REM Create event log source (run as Administrator once)
+eventcreate /ID 1000 /L APPLICATION /T INFORMATION /SO "ChoreMe" /D "ChoreMe service initialized"
+
+REM Configure ChoreMe to use Event Log (add to .env)
+echo LOG_OUTPUT=eventlog >> "C:\Program Files\ChoreMe\.env"
+
+REM View events in Event Viewer
+eventvwr.msc
+REM Navigate to Windows Logs > Application > Filter by Source: ChoreMe
+```
+
+**Method 3: PowerShell Monitoring Script**
+```powershell
+# Create monitoring script: monitor-choreme.ps1
+param(
+    [string]$LogFile = "C:\ProgramData\ChoreMe\logs\choreme.log",
+    [int]$TailLines = 50
+)
+
+Write-Host "Monitoring ChoreMe logs at: $LogFile" -ForegroundColor Green
+Write-Host "Press Ctrl+C to exit" -ForegroundColor Yellow
+Write-Host ""
+
+if (Test-Path $LogFile) {
+    Get-Content $LogFile -Wait -Tail $TailLines | ForEach-Object {
+        $timestamp = Get-Date -Format "HH:mm:ss"
+        
+        if ($_ -match "ERROR|FATAL") {
+            Write-Host "[$timestamp] $_" -ForegroundColor Red
+        } elseif ($_ -match "WARN") {
+            Write-Host "[$timestamp] $_" -ForegroundColor Yellow
+        } elseif ($_ -match "INFO") {
+            Write-Host "[$timestamp] $_" -ForegroundColor Green
+        } else {
+            Write-Host "[$timestamp] $_"
+        }
+    }
+} else {
+    Write-Error "Log file not found: $LogFile"
+}
+```
+
+Run monitoring:
+```powershell
+.\monitor-choreme.ps1
+```
+
+### Cross-Platform Logging Best Practices
+
+#### Log Levels and Format
+Configure in `.env`:
+```env
+# Logging configuration
+LOG_LEVEL=info              # debug, info, warn, error
+LOG_FORMAT=json             # json, text
+LOG_FILE=/path/to/choreme.log   # File path or empty for stdout
+MAX_LOG_SIZE=100MB          # Rotate when file exceeds size
+LOG_RETENTION_DAYS=30       # Keep logs for 30 days
+```
+
+#### Monitoring Scripts
+
+**Linux Log Analysis:**
+```bash
+#!/bin/bash
+# analyze-logs.sh
+LOG_FILE="/var/log/choreme/choreme.log"
+
+echo "=== ChoreMe Log Analysis ==="
+echo "Total lines: $(wc -l < $LOG_FILE)"
+echo "Error count: $(grep -c "ERROR" $LOG_FILE)"
+echo "Warning count: $(grep -c "WARN" $LOG_FILE)"
+echo ""
+echo "Latest errors:"
+grep "ERROR" $LOG_FILE | tail -5
+```
+
+**Windows Log Analysis (PowerShell):**
+```powershell
+# analyze-logs.ps1
+$LogFile = "C:\ProgramData\ChoreMe\logs\choreme.log"
+$Content = Get-Content $LogFile
+
+Write-Host "=== ChoreMe Log Analysis ===" -ForegroundColor Cyan
+Write-Host "Total lines: $($Content.Length)"
+Write-Host "Error count: $(($Content | Select-String "ERROR").Count)"
+Write-Host "Warning count: $(($Content | Select-String "WARN").Count)"
+Write-Host ""
+Write-Host "Latest errors:" -ForegroundColor Red
+$Content | Select-String "ERROR" | Select-Object -Last 5
+```
+
+This comprehensive deployment guide covers both Linux and Windows deployment with proper logging configuration for production use.
+
+### Additional Docker Options
+
+#### Quick Docker Deployment (Alternative)
+```bash
+# SQLite (simplest)
 docker-compose up choreme
-```
 
-#### PostgreSQL
-```bash
+# PostgreSQL 
 docker-compose --profile postgres up choreme-postgres postgres
-```
 
-#### MySQL/MariaDB
-```bash
+# MySQL/MariaDB
 docker-compose --profile mysql up choreme-mysql mysql
-```
 
-#### With Reverse Proxy
-```bash
+# With reverse proxy (SSL)
 docker-compose --profile proxy up choreme caddy
 ```
 
-## Windows Native Deployment (Without Docker)
-
-### Prerequisites for Windows
-
-1. **Install Go**
-   - Download Go 1.21+ from [https://golang.org/dl/](https://golang.org/dl/)
-   - Follow the Windows installation instructions
-   - Verify installation: `go version`
-
-2. **Install Git**
-   - Download from [https://git-scm.com/download/win](https://git-scm.com/download/win)
-   - Use Git Bash or PowerShell for commands
-
-3. **Choose Your Database**
-
-#### Option A: SQLite (Recommended for Single Family)
-- **No additional setup required** - SQLite is embedded
-- Best for: Single household, simple deployment
-
-#### Option B: PostgreSQL
-- Download PostgreSQL from [https://www.postgresql.org/download/windows/](https://www.postgresql.org/download/windows/)
-- Install with default settings
-- Remember the password you set for the `postgres` user
-- PostgreSQL will run as a Windows service
-
-#### Option C: MySQL
-- Download MySQL from [https://dev.mysql.com/downloads/installer/](https://dev.mysql.com/downloads/installer/)
-- Choose "MySQL Installer for Windows"
-- Install MySQL Server with default settings
-- Remember the root password
-
-### Step-by-Step Windows Installation
-
-#### 1. Clone and Setup Project
-
-```cmd
-# Open Command Prompt or PowerShell
-git clone https://github.com/your-org/choreme.git
-cd choreme
-```
-
-#### 2. Configure Environment
-
-```cmd
-# Copy the example environment file
-copy .env.example .env
-
-# Edit .env file with Notepad
-notepad .env
-```
-
-**Configuration Examples:**
-
-For **SQLite** (edit `.env`):
-```env
-DB_TYPE=sqlite
-DB_NAME=C:\choreme\data\choreme.db
-JWT_SECRET=your-secure-random-key-here-change-this
-PORT=8080
-HOST=localhost
-GIN_MODE=release
-```
-
-For **PostgreSQL** (edit `.env`):
-```env
-DB_TYPE=postgres
-DB_HOST=localhost
-DB_PORT=5432
-DB_NAME=choreme
-DB_USER=postgres
-DB_PASS=your_postgres_password
-DB_SSL_MODE=disable
-JWT_SECRET=your-secure-random-key-here-change-this
-PORT=8080
-HOST=localhost
-GIN_MODE=release
-```
-
-For **MySQL** (edit `.env`):
-```env
-DB_TYPE=mysql
-DB_HOST=localhost
-DB_PORT=3306
-DB_NAME=choreme
-DB_USER=root
-DB_PASS=your_mysql_password
-JWT_SECRET=your-secure-random-key-here-change-this
-PORT=8080
-HOST=localhost
-GIN_MODE=release
-```
-
-#### 3. Prepare Database
-
-**For SQLite:**
-```cmd
-# Create data directory
-mkdir C:\choreme\data
-```
-
-**For PostgreSQL:**
-```cmd
-# Connect to PostgreSQL (will prompt for password)
-psql -U postgres -h localhost
-
-# In PostgreSQL shell, create database:
-CREATE DATABASE choreme;
-CREATE USER choreme WITH PASSWORD 'your_password';
-GRANT ALL PRIVILEGES ON DATABASE choreme TO choreme;
-\q
-```
-
-**For MySQL:**
-```cmd
-# Connect to MySQL (will prompt for password)
-mysql -u root -p
-
-# In MySQL shell, create database:
-CREATE DATABASE choreme;
-CREATE USER 'choreme'@'localhost' IDENTIFIED BY 'your_password';
-GRANT ALL PRIVILEGES ON choreme.* TO 'choreme'@'localhost';
-FLUSH PRIVILEGES;
-EXIT;
-```
-
-#### 4. Build and Run Application
-
-```cmd
-# Download Go dependencies
-go mod tidy
-
-# Build the application
-go build -o choreme.exe cmd/choreme/main.go
-
-# Build migration tool
-go build -o migrate.exe cmd/migrate/main.go
-
-# Run database migrations
-migrate.exe up
-
-# Start the application
-choreme.exe
-```
-
-The application will be available at `http://localhost:8080`
-
-### Windows Service Installation (Optional)
-
-To run ChoreMe as a Windows service, you can use tools like NSSM:
-
-#### 1. Download NSSM
-- Download from [https://nssm.cc/download](https://nssm.cc/download)
-- Extract to `C:\nssm`
-
-#### 2. Install Service
-```cmd
-# Run as Administrator
-C:\nssm\nssm.exe install ChoreMe
-
-# In the NSSM GUI:
-# - Path: C:\path\to\your\choreme.exe
-# - Startup directory: C:\path\to\your\choreme
-# - Arguments: (leave empty)
-
-# Start the service
-net start ChoreMe
-```
-
-### Windows Firewall Configuration
-
-If accessing from other devices on your network:
-
-```cmd
-# Run as Administrator
-netsh advfirewall firewall add rule name="ChoreMe" dir=in action=allow protocol=TCP localport=8080
-```
-
-### Running with Enhanced Logging on Windows
-
-For development and troubleshooting, you can run ChoreMe with enhanced logging:
-
-#### Method 1: Run with Detailed Console Logging
-```cmd
-# Set environment variable for detailed logging
-set GIN_MODE=debug
-
-# Run with logging output to console
-choreme.exe
-```
-
-#### Method 2: Run with File Logging
-```cmd
-# Create logs directory
-mkdir C:\choreme\logs
-
-# Run with output redirected to log file (with timestamp)
-echo Starting ChoreMe at %date% %time% >> C:\choreme\logs\choreme.log
-choreme.exe >> C:\choreme\logs\choreme.log 2>&1
-
-# To view logs in real-time (open new Command Prompt)
-powershell Get-Content C:\choreme\logs\choreme.log -Wait
-```
-
-#### Method 3: Run with PowerShell and Timestamped Logs
-```powershell
-# In PowerShell
-$logFile = "C:\choreme\logs\choreme-$(Get-Date -Format 'yyyyMMdd-HHmmss').log"
-Write-Output "Starting ChoreMe with logging to: $logFile"
-.\choreme.exe *>&1 | ForEach-Object { "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss'): $_" } | Tee-Object -FilePath $logFile
-```
-
-#### Method 4: Using Windows Event Logging (Advanced)
-For production environments, you can configure ChoreMe to log to Windows Event Log:
-
-1. **Run as Administrator** and register event source:
-```cmd
-# Register ChoreMe as event source (run once as admin)
-eventcreate /ID 1 /L APPLICATION /T INFORMATION /SO "ChoreMe" /D "ChoreMe service started"
-```
-
-2. **Configure logging in `.env`**:
-```env
-# Add to your .env file
-LOG_LEVEL=info
-LOG_FORMAT=json
-LOG_OUTPUT=eventlog
-```
-
-#### Viewing Logs
-
-**Console Logs:**
-- Real-time output appears in Command Prompt
-- Useful for development and immediate debugging
-
-**File Logs:**
-```cmd
-# View latest log entries
-powershell Get-Content C:\choreme\logs\choreme.log -Tail 50
-
-# Search for errors
-findstr "ERROR" C:\choreme\logs\choreme.log
-
-# Monitor logs in real-time
-powershell Get-Content C:\choreme\logs\choreme.log -Wait -Tail 10
-```
-
-**Event Logs:**
-1. Open Event Viewer (`eventvwr.msc`)
-2. Navigate to Windows Logs → Application
-3. Filter by Source: "ChoreMe"
-
-#### Log Rotation for Long-Running Services
-
-For production use, implement log rotation to manage disk space:
-
-```cmd
-# Create a simple log rotation batch file (rotate-logs.bat)
-@echo off
-set LOG_DIR=C:\choreme\logs
-set MAX_SIZE=10485760
-
-for %%f in ("%LOG_DIR%\choreme.log") do (
-    if %%~zf GTR %MAX_SIZE% (
-        move "%%f" "%LOG_DIR%\choreme-%date:~-4,4%%date:~-7,2%%date:~-10,2%.log"
-        echo. > "%%f"
-    )
-)
-```
-
-Schedule this script to run daily using Windows Task Scheduler.
-
-#### Debugging Specific Issues
-
-**Database Connection Issues:**
-```cmd
-# Run with database debug logging
-set DB_DEBUG=true
-choreme.exe
-```
-
-**API Request Debugging:**
-```cmd
-# Enable HTTP request logging
-set GIN_MODE=debug
-set HTTP_LOG=true
-choreme.exe
-```
-
-**Performance Monitoring:**
-```cmd
-# Run with performance metrics
-set ENABLE_METRICS=true
-choreme.exe
-```
-
-### Troubleshooting Windows Deployment
-
-#### Database Connection Issues
-
-**SQLite:**
-- Ensure the directory `C:\choreme\data` exists
-- Check file permissions on the SQLite database file
-
-**PostgreSQL:**
-- Verify PostgreSQL service is running: `services.msc` → look for "postgresql"
-- Test connection: `psql -U postgres -h localhost -c "SELECT version();"`
-- Check if port 5432 is blocked by firewall
-
-**MySQL:**
-- Verify MySQL service is running: `services.msc` → look for "MySQL"
-- Test connection: `mysql -u root -p -e "SELECT VERSION();"`
-- Check if port 3306 is blocked by firewall
-
-#### Common Issues
-
-1. **"go: command not found"**
-   - Restart Command Prompt after installing Go
-   - Check Go is in your PATH: `echo %PATH%`
-
-2. **Permission denied errors**
-   - Run Command Prompt as Administrator
-   - Check antivirus isn't blocking the executable
-
-3. **Port 8080 already in use**
-   - Change PORT in `.env` file to another port (e.g., 8081)
-   - Or find what's using port 8080: `netstat -ano | findstr :8080`
-
-4. **Migration fails**
-   - Ensure database credentials are correct in `.env`
-   - Check database service is running
-   - Verify database exists and user has permissions
-
-### Windows Performance Tips
-
-1. **Use SSD storage** for SQLite database files
-2. **Exclude database directory** from Windows Defender real-time scanning
-3. **Set Windows power plan** to "High Performance" for server use
-4. **Configure Windows Update** to avoid automatic restarts
-
-### Updating ChoreMe on Windows
-
-```cmd
-# Stop the application (Ctrl+C if running in terminal, or stop service)
-# Pull latest code
-git pull origin main
-
-# Rebuild
-go build -o choreme.exe cmd/choreme/main.go
-go build -o migrate.exe cmd/migrate/main.go
-
-# Run any new migrations
-migrate.exe up
-
-# Restart the application
-choreme.exe
-```
+## UI Options
+
+ChoreMe provides three UI options depending on your setup:
+
+### Option 1: Full React PWA (Recommended)
+- **Complete mobile app experience** with offline support
+- **Camera integration** for chore proof photos  
+- **Push notifications** and installable on mobile devices
+- **Requires**: Node.js 18+ to build the React frontend
+
+### Option 2: Simple HTML UI (Go-only)  
+- **Basic web interface** with essential functionality
+- **No Node.js required** - uses embedded HTML templates
+- **Good for**: Testing, simple deployments, server environments
+
+### Option 3: API-only Mode
+- **Backend API only** with JSON responses
+- **Perfect for**: Custom frontends, mobile apps, integrations
+- **Access**: API documentation at `/api` endpoint
+
+The system automatically detects which UI to serve based on what's available.
 
 ## Database Configuration
 

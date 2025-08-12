@@ -17,7 +17,11 @@
       "Bash(npm install:*)",
       "Bash(npm run build:*)",
       "Bash(chmod:*)",
-      "Bash(PORT=8081 go run cmd/choreme/main.go)"
+      "Bash(PORT=8081 go run cmd/choreme/main.go)",
+      "Bash(go list:*)",
+      "Bash(go:*)",
+      "Bash(npm update)",
+      "Bash(npm cache clean:*)"
     ],
     "deny": []
   }

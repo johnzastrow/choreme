@@ -41,7 +41,7 @@ services:
       - postgres
 
   postgres:
-    image: postgres:15-alpine
+    image: postgres:17-alpine
     environment:
       POSTGRES_DB: choreme
       POSTGRES_USER: choreme
@@ -77,7 +77,7 @@ services:
       - mysql
 
   mysql:
-    image: mysql:8.0
+    image: mysql:9.1
     environment:
       MYSQL_DATABASE: choreme
       MYSQL_USER: choreme
@@ -95,7 +95,7 @@ services:
 
   # Reverse proxy (optional)
   caddy:
-    image: caddy:2-alpine
+    image: caddy:2.8.4-alpine
     ports:
       - "80:80"
       - "443:443"
