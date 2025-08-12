@@ -1,3 +1,13 @@
+// Extend ServiceWorkerRegistration to include background sync API
+declare global {
+  interface ServiceWorkerRegistration {
+    sync?: {
+      register(tag: string): Promise<void>;
+      getTags(): Promise<string[]>;
+    };
+  }
+}
+
 interface PendingAction {
   id: string;
   type: 'progress_update' | 'chore_completion' | 'reward_redemption';
@@ -265,7 +275,9 @@ class OfflineSyncService {
   registerBackgroundSync(tag: string): void {
     if ('serviceWorker' in navigator && 'sync' in window.ServiceWorkerRegistration.prototype) {
       navigator.serviceWorker.ready.then((registration) => {
-        return registration.sync.register(tag);
+        if (registration.sync) {
+          return registration.sync.register(tag);
+        }
       }).catch(error => {
         console.warn('Background sync registration failed:', error);
       });
