@@ -1,6 +1,7 @@
 {
   "name": "choreme-web",
   "version": "2.0.0",
+  "description": "ChoreMe Vue 3 Frontend - Family chore management with account features",
   "private": true,
   "type": "module",
   "scripts": {

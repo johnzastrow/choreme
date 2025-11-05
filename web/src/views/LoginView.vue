@@ -68,15 +68,26 @@
             </v-btn>
           </v-card-actions>
         </v-card>
+
+        <!-- Version Display -->
+        <div class="text-center mt-4">
+          <span class="text-caption text-grey">
+            ChoreMe v{{ appVersion }}
+            <span v-if="backendVersion && backendVersion !== appVersion" class="text-grey-darken-1">
+              (Backend: v{{ backendVersion }})
+            </span>
+          </span>
+        </div>
       </v-col>
     </v-row>
   </v-container>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { api } from '@/api/client'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -86,6 +97,22 @@ const password = ref('')
 const showPassword = ref(false)
 const emailError = ref('')
 const passwordError = ref('')
+const appVersion = ref('2.0.0') // Frontend version from package.json
+const backendVersion = ref('')
+
+// Fetch backend version on mount
+onMounted(async () => {
+  try {
+    const response = await fetch('/health')
+    const data = await response.json()
+    if (data.version) {
+      backendVersion.value = data.version
+    }
+  } catch (error) {
+    // Silently fail if health check is unavailable
+    console.debug('Could not fetch backend version')
+  }
+})
 
 async function handleLogin() {
   // Reset errors
