@@ -7,6 +7,7 @@ import (
 	"github.com/choreme/choreme/internal/auth"
 	"github.com/choreme/choreme/internal/middleware"
 	"github.com/choreme/choreme/internal/model"
+	"github.com/choreme/choreme/internal/version"
 	"github.com/gin-gonic/gin"
 )
 
@@ -105,4 +106,21 @@ func (s *Server) notFound(c *gin.Context, message string) {
 
 func (s *Server) forbidden(c *gin.Context, message string) {
 	s.error(c, http.StatusForbidden, message)
+}
+
+// Health check endpoint
+func (s *Server) healthCheck(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{
+		"status":  "ok",
+		"version": version.GetVersion(),
+	})
+}
+
+// Root handler
+func (s *Server) rootHandler(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{
+		"name":    "ChoreMe API",
+		"version": version.GetVersion(),
+		"status":  "running",
+	})
 }

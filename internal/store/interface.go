@@ -2,6 +2,7 @@ package store
 
 import (
 	"context"
+	"time"
 
 	"github.com/choreme/choreme/internal/model"
 	"github.com/shopspring/decimal"
@@ -61,10 +62,40 @@ type Store interface {
 
 	// Ledger operations
 	CreateLedgerEntry(ctx context.Context, entry *model.LedgerEntry) error
+	CreateLedgerEntryWithBalance(ctx context.Context, entry *model.LedgerEntry) error // Automatically calculates running balance
 	GetLedgerEntriesByUser(ctx context.Context, userID int, filters model.LedgerFilters) ([]*model.LedgerEntry, error)
 	GetLedgerEntriesByHousehold(ctx context.Context, householdID int, filters model.LedgerFilters) ([]*model.LedgerEntry, error)
 	GetUserBalance(ctx context.Context, userID int) (decimal.Decimal, error)
 	GetAllUserBalances(ctx context.Context, householdID int) ([]*model.UserBalance, error)
+
+	// Account operations
+	CreateAccount(ctx context.Context, account *model.Account) error
+	GetAccountByID(ctx context.Context, id int) (*model.Account, error)
+	GetAccountsByUser(ctx context.Context, userID int) ([]*model.Account, error)
+	GetPrimaryAccount(ctx context.Context, userID int) (*model.Account, error)
+	UpdateAccount(ctx context.Context, account *model.Account) error
+	DeleteAccount(ctx context.Context, id int) error
+
+	// Spending limit operations
+	CreateSpendingLimit(ctx context.Context, limit *model.SpendingLimit) error
+	GetSpendingLimitByUserID(ctx context.Context, userID int) (*model.SpendingLimit, error)
+	UpdateSpendingLimit(ctx context.Context, limit *model.SpendingLimit) error
+	CheckSpendingLimit(ctx context.Context, userID int, amount decimal.Decimal) (*model.SpendingCheckResult, error)
+	RecordSpending(ctx context.Context, userID int, amount decimal.Decimal) error
+	ResetSpendingLimits(ctx context.Context) error // Resets limits based on schedule
+
+	// Transfer request operations
+	CreateTransferRequest(ctx context.Context, transfer *model.TransferRequest) error
+	GetTransferRequestByID(ctx context.Context, id int) (*model.TransferRequest, error)
+	GetTransferRequestsByUser(ctx context.Context, userID int) ([]*model.TransferRequest, error)
+	GetPendingTransferRequests(ctx context.Context, householdID int) ([]*model.TransferRequest, error)
+	UpdateTransferRequest(ctx context.Context, transfer *model.TransferRequest) error
+	ApproveTransferRequest(ctx context.Context, transferID int, approvedBy int) error
+	RejectTransferRequest(ctx context.Context, transferID int, approvedBy int, reason string) error
+
+	// Interest operations
+	GetUsersEligibleForInterest(ctx context.Context) ([]*model.User, error)
+	UpdateUserInterestDate(ctx context.Context, userID int, date time.Time) error
 
 	// Audit log operations
 	CreateAuditLog(ctx context.Context, log *model.AuditLog) error

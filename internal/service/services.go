@@ -12,13 +12,14 @@ type Services struct {
 	Assignment *AssignmentService
 	Reward     *RewardService
 	Ledger     *LedgerService
+	Account    *AccountService
 	Audit      *AuditService
 	store      store.Store
 }
 
 func New(store store.Store) *Services {
 	auditService := NewAuditService(store)
-	
+
 	return &Services{
 		Auth:       NewAuthService(store, auditService),
 		Household:  NewHouseholdService(store, auditService),
@@ -27,6 +28,7 @@ func New(store store.Store) *Services {
 		Assignment: NewAssignmentService(store, auditService),
 		Reward:     NewRewardService(store, auditService),
 		Ledger:     NewLedgerService(store, auditService),
+		Account:    NewAccountService(store, auditService),
 		Audit:      auditService,
 		store:      store,
 	}

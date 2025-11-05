@@ -1,523 +1,622 @@
 # ChoreMe - Family Chore Management System
 
-A complete family chore management system with a **mobile-first Progressive Web App** and backend API supporting multiple database backends (SQLite, MySQL/MariaDB, PostgreSQL).
+**Version 2.0.0** - Complete rewrite with Vue 3 + Vuetify and enhanced account management features
+
+A comprehensive family chore management system with a **mobile-first Progressive Web App** and backend API supporting multiple database backends (SQLite, MySQL/MariaDB, PostgreSQL).
 
 ## 📱 Mobile App Experience
 
-**✨ Install like a native app** - Add to your phone's home screen for a complete app experience  
-**📷 Built-in camera** - Take photos directly in the app as proof of chore completion  
-**🔄 Works offline** - Complete chores without internet, syncs automatically when reconnected  
-**🔔 Smart notifications** - Get reminders for due chores and updates on earnings  
-**💰 Real-time earnings** - See your balance update instantly when chores are approved  
+**✨ Install like a native app** - Add to your phone's home screen for a complete app experience
+**💰 Savings account system** - Track earnings with running balances and transaction history
+**💸 Spending limits** - Configurable daily/weekly/monthly spending controls
+**🔄 Transfers** - Request and approve money transfers between family members
+**📈 Interest accrual** - Automatic monthly compound interest (configurable per user)
+**📊 Account statements** - Generate HTML/PDF statements with charts and statistics
+**🔔 Smart notifications** - Get reminders for due chores and updates on earnings
 **👨‍👩‍👧‍👦 Family-focused** - Each family member has their own secure view and data
+
+## What's New in 2.0
+
+### Enhanced Savings Account Features
+- **Running Balance** - See cumulative balance after each transaction
+- **Transaction Types** - Earn, spend, deposit, withdrawal, transfer, interest, adjust
+- **Manual Deposits** - Admins can add money (e.g., "Birthday money from grandma")
+- **Manual Withdrawals** - Workers request withdrawals with spending limit checks
+- **Transfer System** - Request transfers between users with admin approval workflow
+- **Interest Accrual** - Monthly compound interest (rate configurable per user, default 0%)
+- **Spending Limits** - Daily/weekly/monthly limits with automatic reset and enforcement
+- **Account Statements** - Generate statements with charts and transaction history (HTML/PDF)
+
+### Modern Frontend
+- **Vue 3 + Vuetify** - Modern Material Design component framework
+- **TypeScript** - Complete type safety across frontend and backend
+- **Vite** - Lightning-fast build tool and development server
+- **Pinia** - Modern state management with composition API
+- **Reactive UI** - Real-time updates with computed properties and watchers
+
+### Backend Enhancements
+- **Background Jobs** - Automatic interest accrual and spending limit resets
+- **Database Conversion** - Migrate between SQLite and MariaDB
+- **Enhanced Ledger** - Running balance auto-calculated on insert
+- **Audit Trail** - Complete logging of all account operations
+- **JSON Backup/Restore** - Data portability and backup utility
 
 ## Features
 
-### 📱 Mobile Progressive Web App
-- **Mobile-First Design**: Touch-optimized interface with native app experience
-- **PWA Ready**: Installable on home screen with offline support
-- **Responsive UI**: Works perfectly on phones, tablets, and desktops
-- **Camera Integration**: Built-in photo capture for chore proof
-- **Push Notifications**: Real-time reminders and status updates
-- **Offline-First**: Works without internet, syncs when reconnected
-- **Background Sync**: Automatic data synchronization when online
-- **App-like Experience**: Standalone display mode, bottom navigation
+### 💰 Enhanced Account Management
 
-### 🔧 Backend API System
-- **Multi-Database Support**: Choose between SQLite, MySQL/MariaDB, or PostgreSQL
-- **RESTful API**: 29+ endpoints with comprehensive functionality
-- **JWT Authentication**: Secure token-based authentication
-- **Role-Based Access**: System admin, admin, manager, worker, and observer roles
-- **Auto-scaling Architecture**: Database abstraction supports growth
+#### Transaction Types
+- **Earn** - Complete chores to earn money/points
+- **Spend** - Redeem rewards and make purchases
+- **Deposit** - Admin adds money (birthday gifts, allowance, etc.)
+- **Withdrawal** - Worker-initiated, spending limit checked
+- **Transfer** - Move money between users (requires admin approval)
+- **Interest** - Automatic monthly compound interest
+- **Adjust** - Admin manual balance adjustments with notes
+
+#### Spending Limits
+- Configurable per user: daily, weekly, monthly limits
+- Automatic reset on schedule (daily at midnight, weekly on Sunday, monthly on 1st)
+- Block transactions when limit reached
+- Warn and suggest maximum amount when transaction would exceed limit
+- Admin can manually reset limits anytime
+- Visual indicators showing remaining balance before limit
+
+#### Transfers Between Users
+- Worker initiates transfer request with amount and description
+- Request enters pending queue for admin review
+- Admin can approve or reject with reason
+- On approval: debit sender, credit receiver atomically
+- Complete audit trail of all transfer activity
+- Workers cannot see other workers' balances
+
+#### Interest Accrual
+- Configurable annual interest rate per user (default: 0%)
+- Monthly compound calculation (annual rate / 12)
+- Automatic accrual on 1st of each month at 1:00 AM
+- Only positive balances earn interest
+- System admins can trigger manual accrual
+- Interest transactions visible in ledger with type "interest"
+
+#### Account Statements
+- Generate detailed statements with date range
+- Transaction history with running balance
+- Charts: spending by category, earnings over time
+- Statistics: total earned, total spent, average daily balance
+- Export formats: HTML (viewable) and PDF (printable)
+- Filterable by transaction type and date range
 
 ### 🏠 Family Management
-- **Household Organization**: Multi-family support with invite codes
-- **User Roles**: Granular permissions for different family members
-- **Privacy Controls**: Workers only see their own chores and earnings
-- **Invite System**: Secure family member onboarding
+- **Household Organization** - Multi-family support with invite codes
+- **User Roles** - System admin, admin, manager, worker, and observer roles
+- **Privacy Controls** - Workers only see their own chores and earnings
+- **Invite System** - Secure family member onboarding
 
 ### ✅ Chore Management
-- **Smart Assignment**: Assign chores to multiple family members
-- **Progress Tracking**: Percentage-based completion monitoring
-- **Due Date Management**: Automatic late penalty calculations
-- **Photo Proof**: Camera integration with automatic image compression
-- **Recurring Patterns**: Daily, weekly, monthly, or custom schedules
-- **Auto-approval**: Configurable trust system for experienced workers
+- **Smart Assignment** - Assign chores to multiple family members
+- **Progress Tracking** - Percentage-based completion monitoring
+- **Due Date Management** - Automatic late penalty calculations
+- **Photo Proof** - Camera integration with automatic image compression
+- **Recurring Patterns** - Daily, weekly, monthly, or custom schedules
+- **Auto-approval** - Configurable trust system for experienced workers
 
 ### 💰 Earnings & Rewards
-- **Decimal Precision**: Accurate monetary tracking with shopspring/decimal
-- **Complete Ledger**: Full transaction history and audit trail
-- **Reward Store**: Family-customizable reward redemption system
-- **Balance Tracking**: Real-time earnings and spending visibility
-- **Manual Adjustments**: Admin controls for special circumstances
+- **Decimal Precision** - Accurate monetary tracking with shopspring/decimal
+- **Complete Ledger** - Full transaction history with running balance
+- **Reward Store** - Family-customizable reward redemption system
+- **Balance Tracking** - Real-time earnings and spending visibility
+- **Manual Adjustments** - Admin controls for special circumstances
 
 ### 🔒 Security & Compliance
-- **Audit Trail**: Complete logging of all user actions
-- **Data Encryption**: JWT tokens and password hashing
-- **CORS Protection**: Configurable cross-origin security
-- **Input Validation**: Comprehensive request validation
-- **Error Handling**: Graceful failure management
+- **Audit Trail** - Complete logging of all user actions
+- **Data Encryption** - JWT tokens and password hashing
+- **CORS Protection** - Configurable cross-origin security
+- **Input Validation** - Comprehensive request validation
+- **Error Handling** - Graceful failure management
 
-## Dependencies & Prerequisites
+## Technology Stack
 
-ChoreMe supports three deployment modes with different dependency requirements:
+### Backend (Go)
+- **Framework**: Gin 1.10.0 - High-performance HTTP web framework
+- **Authentication**: JWT (golang-jwt/jwt v5.2.1) - Token-based auth
+- **Database**: SQLite 1.14.24 / MySQL 1.8.1 / PostgreSQL (lib/pq 1.10.9)
+- **Decimals**: shopspring/decimal 1.4.0 - Precise monetary calculations
+- **Migrations**: golang-migrate/migrate v4.17.1 - Database versioning
+- **Configuration**: caarlos0/env v10.0.0 - Environment variables
+- **Security**: golang.org/x/crypto - Password hashing
 
-### Option 1: Go Backend Only (Simple HTML UI)
-**Minimum Requirements:**
-- Go 1.22 or later
-- Database (SQLite embedded, or MySQL/PostgreSQL)
+### Frontend (Vue 3)
+- **Framework**: Vue 3.4.15 - Progressive JavaScript framework
+- **UI Library**: Vuetify 3.5.1 - Material Design component library
+- **Router**: Vue Router 4.2.5 - Official Vue routing
+- **State**: Pinia 2.1.7 - Intuitive Vue state management
+- **Build**: Vite 5.0.11 - Next generation frontend tooling
+- **HTTP Client**: Axios 1.6.5 - Promise-based HTTP client
+- **Charts**: Chart.js 4.4.1 + Vue-ChartJs 5.3.0 - Data visualization
+- **Utilities**: @vueuse/core 10.7.2 - Composition API utilities
+- **TypeScript**: Full type safety with TypeScript 5.3.3
 
-**Quick Start:**
-```bash
-git clone https://github.com/your-org/choreme.git
-cd choreme
-go mod tidy
-go build -o choreme cmd/choreme/main.go
-./choreme
-```
+### Database Support
+- **SQLite** - Embedded, zero-configuration (perfect for single families)
+- **MySQL/MariaDB** - Traditional web hosting, moderate scale
+- **PostgreSQL** - Advanced features, high concurrency, large families
 
-### Option 2: Full PWA Experience (React Frontend + Go Backend) 
-**Requirements:**
-- Go 1.22 or later
-- Node.js 18+ and npm
-- Database (SQLite embedded, or MySQL/PostgreSQL)
+### Infrastructure
+- **Deployment**: Docker with multi-stage builds
+- **Proxy**: Caddy 2.8.4-alpine - Automatic HTTPS and reverse proxy
+- **Logging**: Structured JSON logging with configurable levels
+- **Monitoring**: Built-in health checks and metrics
 
-**Quick Start:**
-```bash
-# Terminal 1: Backend
-git clone https://github.com/your-org/choreme.git
-cd choreme
-go mod tidy
-go run cmd/choreme/main.go
+## Quick Start
 
-# Terminal 2: Frontend
-cd web
-npm install
-npm start
-```
-
-### Option 3: Docker Deployment
-**Requirements:**
-- Docker and Docker Compose
-
-**Quick Start:**
-```bash
-git clone https://github.com/your-org/choreme.git
-cd choreme
-docker-compose up choreme
-```
-
-## 📦 Complete Dependency List
-
-### **Go Backend Dependencies (go.mod)**
-
-#### Core Dependencies
-| Package | Version | Purpose |
-|---------|---------|---------|
-| **github.com/gin-gonic/gin** | v1.10.0 | HTTP web framework |
-| **github.com/golang-jwt/jwt/v5** | v5.2.1 | JWT authentication |
-| **github.com/shopspring/decimal** | v1.4.0 | Precise monetary calculations |
-| **github.com/golang-migrate/migrate/v4** | v4.17.1 | Database migrations |
-| **github.com/caarlos0/env/v10** | v10.0.0 | Environment configuration |
-| **golang.org/x/crypto** | v0.31.0 | Password hashing & crypto |
-
-#### Database Drivers
-| Package | Version | Purpose |
-|---------|---------|---------|
-| **github.com/mattn/go-sqlite3** | v1.14.24 | SQLite database driver |
-| **github.com/go-sql-driver/mysql** | v1.8.1 | MySQL/MariaDB driver |
-| **github.com/lib/pq** | v1.10.9 | PostgreSQL driver |
-
-#### Indirect Dependencies (Auto-managed)
-- **github.com/bytedance/sonic** v1.11.6 - High-performance JSON
-- **github.com/go-playground/validator/v10** v10.20.0 - Input validation  
-- **golang.org/x/net** v0.25.0 - Network utilities
-- **golang.org/x/sys** v0.28.0 - System calls
-- **google.golang.org/protobuf** v1.34.1 - Protocol buffers
-
-### **React Frontend Dependencies (package.json)**
-
-#### Core React Dependencies
-| Package | Version | Purpose |
-|---------|---------|---------|
-| **react** | ^18.2.0 | Core React library |
-| **react-dom** | ^18.2.0 | React DOM rendering |
-| **react-router-dom** | ^6.20.0 | Client-side routing |
-| **react-scripts** | 5.0.1 | Build tooling (CRA) |
-| **typescript** | ^4.9.5 | TypeScript support |
-
-#### TypeScript Type Definitions
-| Package | Version | Purpose |
-|---------|---------|---------|
-| **@types/node** | ^18.19.0 | Node.js type definitions |
-| **@types/react** | ^18.2.45 | React type definitions |
-| **@types/react-dom** | ^18.2.18 | React DOM types |
-
-#### Styling & UI Dependencies  
-| Package | Version | Purpose |
-|---------|---------|---------|
-| **tailwindcss** | ^3.3.5 | Utility-first CSS framework |
-| **@tailwindcss/forms** | ^0.5.6 | Form styling plugin |
-| **autoprefixer** | ^10.4.16 | CSS vendor prefixing |
-| **postcss** | ^8.4.31 | CSS transformation tool |
-
-#### Utility Dependencies
-| Package | Version | Purpose |
-|---------|---------|---------|
-| **lodash** | ^4.17.21 | JavaScript utility library |
-| **web-vitals** | ^3.5.0 | Performance monitoring |
-
-### **Docker Infrastructure Dependencies**
-
-#### Database Images
-| Image | Version | Purpose |
-|-------|---------|---------|
-| **postgres** | 17-alpine | PostgreSQL database |
-| **mysql** | 9.1 | MySQL database |
-
-#### Infrastructure Images  
-| Image | Version | Purpose |
-|-------|---------|---------|
-| **golang** | 1.22-alpine | Go build environment |
-| **alpine** | latest | Minimal container base |
-| **caddy** | 2.8.4-alpine | Reverse proxy & SSL |
-
-### **Development Tools**
-
-#### Go Development
-```bash
-# Required Go version
-go version # Should show 1.22+
-
-# Go development tools (optional)
-go install github.com/cosmtrek/air@latest      # Live reload
-go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest  # Linting
-```
-
-#### Node.js Development  
-```bash
-# Required Node.js version
-node --version  # Should show 18+
-npm --version   # Should show 9+
-
-# Global development tools (optional)
-npm install -g serve                    # Static file server
-npm install -g @storybook/cli           # Component development
-npm install -g typescript              # TypeScript compiler
-```
-
-### **Production Dependencies**
-
-#### System Requirements
-| Component | Minimum | Recommended | Notes |
-|-----------|---------|-------------|-------|
-| **CPU** | 1 core | 2+ cores | For concurrent requests |
-| **RAM** | 512MB | 2GB | Includes database buffer |
-| **Storage** | 100MB | 1GB+ | For database & logs |
-| **Network** | Any | Stable internet | For syncing & notifications |
-
-#### Database Requirements
-| Database | Version | Storage | Memory |
-|----------|---------|---------|---------|
-| **SQLite** | Latest | 50MB+ | Minimal | 
-| **PostgreSQL** | 15+ | 100MB+ | 256MB+ |
-| **MySQL** | 8.0+ | 100MB+ | 256MB+ |
-
-### **Security Dependencies**
-
-#### SSL/TLS Requirements
-- **Let's Encrypt** (free SSL certificates)
-- **Caddy** (automatic HTTPS) or **nginx** with certbot
-- **HTTPS required** for PWA features (camera, notifications)
-
-#### Authentication Dependencies
-- **JWT tokens** (stateless authentication)
-- **bcrypt** (password hashing via golang.org/x/crypto)
-- **CORS middleware** (cross-origin protection)
-
-### **Monitoring Dependencies (Optional)**
-
-#### Logging & Metrics
-```bash
-# System monitoring
-sudo apt install htop iotop          # Linux system monitoring  
-brew install htop                    # macOS system monitoring
-
-# Application monitoring  
-# Built into ChoreMe - check /health endpoint
-curl http://localhost:8080/health
-```
-
-#### Backup Dependencies
-```bash
-# Database backup tools
-sudo apt install postgresql-client   # PostgreSQL backup tools
-sudo apt install mysql-client       # MySQL backup tools  
-# SQLite: No additional tools needed (just copy .db file)
-```
-
-### **Browser Compatibility**
-
-#### PWA Requirements
-| Browser | Version | PWA Support | Camera API | Notifications |
-|---------|---------|-------------|------------|---------------|
-| **Chrome** | 88+ | ✅ Full | ✅ | ✅ |
-| **Firefox** | 85+ | ✅ Full | ✅ | ✅ |
-| **Safari** | 14+ | ✅ Partial | ✅ | ❌ Limited |
-| **Edge** | 88+ | ✅ Full | ✅ | ✅ |
-
-#### Mobile Support
-- **iOS Safari** 14+ (PWA installable)
-- **Android Chrome** 88+ (Full PWA support)
-- **Samsung Internet** 12+ (Full PWA support)
-
-### **Installation Commands Summary**
-
-#### Complete Installation (All Dependencies)
-```bash
-# 1. Install system dependencies
-# Ubuntu/Debian:
-sudo apt update && sudo apt install -y git curl build-essential
-
-# macOS:
-xcode-select --install
-
-# 2. Install Go 1.22+
-curl -L https://go.dev/dl/go1.22.0.linux-amd64.tar.gz | sudo tar -C /usr/local -xz
-echo 'export PATH=$PATH:/usr/local/go/bin' >> ~/.bashrc
-
-# 3. Install Node.js 18+
-curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
-sudo apt install -y nodejs
-
-# 4. Install Docker (optional)
-curl -fsSL https://get.docker.com | sh
-
-# 5. Clone and build ChoreMe
-git clone https://github.com/your-org/choreme.git
-cd choreme
-go mod tidy
-cd web && npm install && npm run build
-cd .. && go build -o choreme cmd/choreme/main.go
-```
-
-#### Dependency Verification
-```bash
-# Verify all dependencies are correctly installed
-go version          # Should show 1.22+
-node --version      # Should show v18+  
-npm --version       # Should show 9+
-docker --version    # Should show 20+
-
-# Test builds
-go build -o test-choreme cmd/choreme/main.go && rm test-choreme
-cd web && npm run build && cd ..
-
-echo "✅ All dependencies verified successfully!"
-```
-
-## Quick Start (All Platforms)
-
-### Prerequisites Overview
+### Prerequisites
 
 | Component | Minimum | Recommended | Purpose |
 |-----------|---------|-------------|---------|
 | **Go** | 1.22+ | 1.22.8+ | Backend API server |
-| **Node.js** | 18.0+ | 20+ LTS | PWA frontend (optional) |
+| **Node.js** | 18.0+ | 20+ LTS | Vue 3 frontend |
 | **Database** | SQLite (embedded) | PostgreSQL 17+ | Data storage |
 | **Docker** | 20.10+ | Latest | Containerized deployment |
-| **Memory** | 512MB | 2GB | Application runtime |
-| **Storage** | 100MB | 1GB+ | Database and logs |
 
-**Quick Verification:**
+### Quick Verification
 ```bash
-# Check installed versions
-go version      # Should show: go version go1.22+ 
+go version      # Should show: go1.22+
 node --version  # Should show: v18.0+ or v20+
 npm --version   # Should show: 9.0+ or 10+
-docker --version # Should show: Docker version 20.10+
 ```
 
-## Build Instructions
+### Development Setup
 
-ChoreMe provides multiple build options depending on your needs:
+#### Option 1: Full Development (Backend + Frontend)
 
-### Option 1: Go Backend with Embedded UI
-This builds the backend with an embedded simple HTML UI (no Node.js required):
-
-**Linux/macOS:**
-```bash
-# Clone and setup
-git clone https://github.com/your-org/choreme.git
-cd choreme
-
-# Configure environment
-cp .env.example .env
-# Edit .env as needed
-
-# Build and run
-go mod tidy
-go build -o choreme cmd/choreme/main.go
-./choreme
-```
-
-**Windows:**
-```cmd
-REM Clone and setup
-git clone https://github.com/your-org/choreme.git
-cd choreme
-
-REM Configure environment  
-copy .env.example .env
-REM Edit .env with notepad .env
-
-REM Build and run
-go mod tidy
-go build -o choreme.exe cmd/choreme/main.go
-choreme.exe
-```
-
-### Option 2: Backend + Full React PWA
-This builds both the Go backend and React PWA frontend:
-
-**Linux/macOS:**
+**Terminal 1 - Backend:**
 ```bash
 # Clone repository
 git clone https://github.com/your-org/choreme.git
 cd choreme
 
-# Build backend
+# Configure environment
+cp .env.example .env
+# Edit .env: Set DB_TYPE, JWT_SECRET, etc.
+
+# Install Go dependencies and run
 go mod tidy
-go build -o choreme cmd/choreme/main.go
+go run cmd/choreme/main.go
 
-# Build PWA (in another terminal)
-cd web
-npm install
-npm run build
-
-# The React build will be embedded in the Go binary when you restart
-./choreme
+# Backend running at http://localhost:8080
 ```
 
-**Windows:**
-```cmd
-REM Clone repository
+**Terminal 2 - Frontend:**
+```bash
+# Install and run Vue 3 frontend
+cd web
+npm install
+npm run dev
+
+# Frontend running at http://localhost:3000
+# API proxied to http://localhost:8080
+```
+
+#### Option 2: Docker Deployment
+
+```bash
+# Clone repository
 git clone https://github.com/your-org/choreme.git
 cd choreme
 
-REM Build backend
-go mod tidy
-go build -o choreme.exe cmd/choreme/main.go
+# SQLite (simplest)
+docker-compose up choreme
 
-REM Build PWA (in another Command Prompt)
+# PostgreSQL (recommended for production)
+docker-compose --profile postgres up
+
+# MySQL/MariaDB
+docker-compose --profile mysql up
+
+# With reverse proxy (automatic HTTPS)
+docker-compose --profile proxy up
+```
+
+#### Option 3: Production Build
+
+```bash
+# Build backend
+go build -o choreme cmd/choreme/main.go
+
+# Build Vue frontend
 cd web
 npm install
 npm run build
 
-REM The React build will be embedded in the Go binary when you restart
-choreme.exe
-```
+# Built files in web/dist/ can be served by backend
+# Or deploy separately to Netlify/Vercel/CDN
 
-### Option 3: Automated Build Scripts
-ChoreMe includes build scripts that automatically handle the React build and embedding:
-
-**Linux:**
-```bash
-# Make script executable
-chmod +x scripts/build-with-ui.sh
-
-# Run automated build
-./scripts/build-with-ui.sh
-
-# Run the application
+# Run backend (serves built frontend from web/dist)
 ./choreme
 ```
 
-**Windows:**
-```cmd
-REM Run automated build
-scripts\build-with-ui.bat
+## Configuration
 
-REM Run the application
-choreme.exe
+### Backend Configuration (.env)
+
+```env
+# Database Configuration
+DB_TYPE=sqlite              # sqlite, mysql, or postgres
+DB_NAME=choreme.db          # Database name or file path
+
+# For PostgreSQL
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=choreme
+DB_PASS=your_password
+DB_SSL_MODE=disable
+
+# For MySQL
+DB_HOST=localhost
+DB_PORT=3306
+DB_USER=choreme
+DB_PASS=your_password
+
+# Server Configuration
+HOST=0.0.0.0
+PORT=8080
+GIN_MODE=release            # debug or release
+
+# Security
+JWT_SECRET=your-secure-random-key-change-this-in-production
+CORS_ORIGINS=http://localhost:3000,https://your-domain.com
+
+# Logging
+LOG_LEVEL=info              # debug, info, warn, error
+LOG_FORMAT=json             # json or text
+
+# Background Jobs
+ENABLE_SCHEDULER=true       # Enable interest accrual and limit resets
 ```
 
-### Build Verification
-After building, verify your installation:
+### Frontend Configuration (web/.env)
 
-```bash
-# Check which UI is active (should show one of these messages):
-# "Embedded React PWA enabled - serving full mobile UI"
-# "Simple HTML UI enabled" 
-# "API documentation mode"
+```env
+# API Endpoint (for production build)
+VITE_API_URL=https://your-api-domain.com/api/v1
 
-# Test the API
-curl http://localhost:8080/health
+# For development, Vite proxy is configured in vite.config.ts
 ```
 
-### Development Build
-For development with hot reloading:
+## API Documentation
 
-**Backend (Go):**
-```bash
-# Terminal 1: Run backend with live reload
-go run cmd/choreme/main.go
+### Base URL
+```
+http://localhost:8080/api/v1
 ```
 
-**Frontend (React):**
-```bash
-# Terminal 2: Run PWA dev server
-cd web
-npm start
-# PWA available at http://localhost:3000
-# API available at http://localhost:8080
+### Health Check
+```http
+GET /health
+
+Response:
+{
+  "status": "ok",
+  "version": "2.0.0"
+}
 ```
 
-## Deployment Instructions
+### Authentication Endpoints
 
-### Linux Deployment
+#### Register First User (Creates Household)
+```http
+POST /api/v1/auth/register
+Content-Type: application/json
 
-#### Method 1: Systemd Service (Recommended)
+{
+  "household_name": "The Johnsons",
+  "name": "Alice Johnson",
+  "email": "alice@example.com",
+  "password": "securepassword"
+}
+```
+
+#### Login
+```http
+POST /api/v1/auth/login
+Content-Type: application/json
+
+{
+  "email": "alice@example.com",
+  "password": "securepassword"
+}
+
+Response:
+{
+  "success": true,
+  "data": {
+    "user": { ... },
+    "token": "eyJhbGc..."
+  }
+}
+```
+
+### Account Management Endpoints
+
+#### Deposit Money
+```http
+POST /api/v1/accounts/deposit
+Authorization: Bearer <admin_token>
+Content-Type: application/json
+
+{
+  "user_id": 2,
+  "amount": "25.00",
+  "description": "Birthday money from grandma"
+}
+```
+
+#### Withdraw Money
+```http
+POST /api/v1/accounts/withdraw
+Authorization: Bearer <worker_token>
+Content-Type: application/json
+
+{
+  "amount": "10.00",
+  "description": "Spending money for movies"
+}
+
+Response (on limit exceeded):
+{
+  "success": false,
+  "error": "Transaction would exceed daily limit. Maximum allowed: 5.00",
+  "limit_type": "daily",
+  "suggested_amount": "5.00",
+  "daily_remaining": "5.00"
+}
+```
+
+#### Create Transfer Request
+```http
+POST /api/v1/accounts/transfer
+Authorization: Bearer <worker_token>
+Content-Type: application/json
+
+{
+  "to_user_id": 3,
+  "amount": "15.00",
+  "description": "Borrowing for game purchase"
+}
+```
+
+#### Approve Transfer (Admin)
+```http
+PATCH /api/v1/accounts/transfer/{id}/approve
+Authorization: Bearer <admin_token>
+Content-Type: application/json
+
+{
+  "notes": "Transfer approved"
+}
+```
+
+#### Set Spending Limits (Admin)
+```http
+PUT /api/v1/accounts/spending-limits/{user_id}
+Authorization: Bearer <admin_token>
+Content-Type: application/json
+
+{
+  "daily_limit": "20.00",
+  "weekly_limit": "50.00",
+  "monthly_limit": "150.00"
+}
+```
+
+#### Set Interest Rate (Admin)
+```http
+PUT /api/v1/users/{id}/interest
+Authorization: Bearer <admin_token>
+Content-Type: application/json
+
+{
+  "interest_rate_annual": "5.00"
+}
+```
+
+#### Get Ledger Entries
+```http
+GET /api/v1/accounts/ledger?limit=50&offset=0
+Authorization: Bearer <token>
+
+Response:
+{
+  "success": true,
+  "data": {
+    "entries": [
+      {
+        "id": 1,
+        "user_id": 2,
+        "type": "earn",
+        "amount": "5.00",
+        "description": "Completed: Wash dishes",
+        "running_balance": "25.50",
+        "created_at": "2024-01-15T10:30:00Z"
+      }
+    ],
+    "total": 100
+  }
+}
+```
+
+For complete API documentation, see [BACKEND_IMPLEMENTATION.md](./BACKEND_IMPLEMENTATION.md).
+
+## Project Structure
+
+```
+choreme/
+├── cmd/
+│   └── choreme/           # Main application entry point
+├── internal/              # Backend Go code
+│   ├── api/              # HTTP handlers and routing
+│   │   ├── server.go     # Server setup and routes
+│   │   ├── helpers.go    # Common response helpers
+│   │   ├── auth.go       # Authentication endpoints
+│   │   ├── accounts.go   # Account management endpoints
+│   │   ├── chores.go     # Chore management endpoints
+│   │   └── ...
+│   ├── auth/             # JWT and password handling
+│   ├── config/           # Configuration management
+│   ├── middleware/       # HTTP middleware
+│   ├── model/            # Domain models
+│   ├── scheduler/        # Background jobs
+│   ├── service/          # Business logic layer
+│   │   ├── account.go    # Account management service
+│   │   ├── chore.go      # Chore management service
+│   │   └── ...
+│   ├── store/            # Database abstraction layer
+│   │   ├── interface.go  # Store interface
+│   │   ├── factory.go    # Database factory
+│   │   ├── sqlite/       # SQLite implementation
+│   │   │   ├── sqlite.go
+│   │   │   └── sqlite_accounts.go
+│   │   ├── mysql/        # MySQL implementation
+│   │   └── postgres/     # PostgreSQL implementation
+│   └── version/          # Version management
+├── migrations/           # Database migrations
+│   ├── sqlite/          # SQLite-specific migrations
+│   ├── mysql/           # MySQL-specific migrations
+│   └── postgres/        # PostgreSQL-specific migrations
+├── web/                  # Vue 3 Frontend
+│   ├── public/          # Static assets
+│   │   └── index.html
+│   ├── src/
+│   │   ├── api/         # API client
+│   │   │   └── client.ts
+│   │   ├── components/  # Reusable components
+│   │   ├── plugins/     # Vuetify configuration
+│   │   │   └── vuetify.ts
+│   │   ├── router/      # Vue Router configuration
+│   │   │   └── index.ts
+│   │   ├── stores/      # Pinia stores
+│   │   │   ├── auth.ts  # Authentication state
+│   │   │   └── account.ts # Account state
+│   │   ├── types/       # TypeScript type definitions
+│   │   │   └── index.ts
+│   │   ├── views/       # Page components
+│   │   │   ├── LoginView.vue
+│   │   │   ├── DashboardView.vue
+│   │   │   ├── AccountView.vue
+│   │   │   └── ...
+│   │   ├── App.vue      # Root component
+│   │   └── main.ts      # Application entry
+│   ├── package.json
+│   ├── vite.config.ts   # Vite configuration
+│   └── tsconfig.json    # TypeScript configuration
+├── VERSION               # Centralized version number
+├── .env.example         # Environment template
+├── docker-compose.yml   # Docker orchestration
+├── Dockerfile           # Container definition
+├── go.mod              # Go dependencies
+└── README.md           # This file
+```
+
+## Database Schema
+
+### Core Tables
+- **households** - Family/household groups
+- **users** - Family members with roles and interest rates
+- **chores** - Chore definitions
+- **assignments** - Chore assignments to users
+- **ledger** - Transaction history with running balance
+- **rewards** - Reward store items
+- **redemptions** - Reward redemption requests
+- **audit_logs** - Complete audit trail
+
+### Account Management Tables (New in 2.0)
+- **accounts** - User savings accounts
+- **spending_limits** - Daily/weekly/monthly spending controls
+- **transfer_requests** - Transfer requests and approval workflow
+
+### Key Schema Features
+- **Running Balance** - Auto-calculated on each ledger insert
+- **Decimal Precision** - DECIMAL(10,2) for all monetary values
+- **Audit Trail** - Complete logging with user attribution
+- **Referential Integrity** - Foreign keys with cascade deletes
+
+For complete schema details, see migration files in `migrations/`.
+
+## Background Jobs
+
+The backend includes a built-in scheduler for automated tasks:
+
+### Interest Accrual
+- **Schedule**: Monthly on 1st at 1:00 AM
+- **Process**: Calculates monthly compound interest for all users with positive balances
+- **Formula**: `monthly_interest = balance * (annual_rate / 12 / 100)`
+- **Logging**: Creates ledger entry with type "interest"
+
+### Spending Limit Resets
+- **Daily Reset**: Every day at midnight (00:00)
+- **Weekly Reset**: Every Sunday at midnight
+- **Monthly Reset**: 1st of each month at midnight
+- **Process**: Resets spent amounts and unblocks users who hit limits
+
+### Manual Triggers (System Admins)
+```http
+POST /api/v1/admin/jobs/interest
+POST /api/v1/admin/jobs/reset-limits
+Authorization: Bearer <system_admin_token>
+```
+
+## Deployment
+
+### Linux Production Deployment
+
+#### Systemd Service (Recommended)
 
 **1. Build and Install:**
 ```bash
 # Build application
 git clone https://github.com/your-org/choreme.git
 cd choreme
-go mod tidy
 go build -o choreme cmd/choreme/main.go
 
-# Create application directory
+# Build Vue frontend
+cd web
+npm install
+npm run build
+cd ..
+
+# Install to system
 sudo mkdir -p /opt/choreme
 sudo cp choreme /opt/choreme/
 sudo cp -r migrations /opt/choreme/
+sudo cp -r web/dist /opt/choreme/web/
 
 # Create data directory
 sudo mkdir -p /var/lib/choreme
-sudo chown choreme:choreme /var/lib/choreme
-```
-
-**2. Create System User:**
-```bash
 sudo useradd --system --home /var/lib/choreme --shell /bin/false choreme
+sudo chown -R choreme:choreme /var/lib/choreme
 ```
 
-**3. Configure Environment:**
+**2. Configure:**
 ```bash
+# Generate secure JWT secret
+JWT_SECRET=$(openssl rand -base64 32)
+
+# Create environment file
 sudo tee /opt/choreme/.env > /dev/null <<EOF
 DB_TYPE=sqlite
 DB_NAME=/var/lib/choreme/choreme.db
-JWT_SECRET=$(openssl rand -base64 32)
+JWT_SECRET=${JWT_SECRET}
 HOST=0.0.0.0
 PORT=8080
 GIN_MODE=release
+ENABLE_SCHEDULER=true
 EOF
 
 sudo chown choreme:choreme /opt/choreme/.env
 sudo chmod 600 /opt/choreme/.env
 ```
 
-**4. Create Systemd Service:**
+**3. Create Systemd Service:**
 ```bash
 sudo tee /etc/systemd/system/choreme.service > /dev/null <<EOF
 [Unit]
@@ -532,914 +631,197 @@ WorkingDirectory=/opt/choreme
 ExecStart=/opt/choreme/choreme
 Restart=always
 RestartSec=5
-Environment=HOME=/var/lib/choreme
-
-# Security settings
-NoNewPrivileges=yes
-ProtectSystem=strict
-ProtectHome=yes
-ReadWritePaths=/var/lib/choreme
-PrivateTmp=yes
-ProtectKernelTunables=yes
-ProtectKernelModules=yes
-ProtectControlGroups=yes
-
-# Logging
-StandardOutput=journal
-StandardError=journal
-SyslogIdentifier=choreme
 
 [Install]
 WantedBy=multi-user.target
 EOF
 ```
 
-**5. Enable and Start Service:**
+**4. Enable and Start:**
 ```bash
 sudo systemctl daemon-reload
 sudo systemctl enable choreme
 sudo systemctl start choreme
-
-# Check status
 sudo systemctl status choreme
-
-# View logs
-sudo journalctl -u choreme -f
 ```
-
-#### Method 2: Docker on Linux
-
-**1. Using Docker Compose:**
-```bash
-git clone https://github.com/your-org/choreme.git
-cd choreme
-
-# Create production docker-compose.override.yml
-cat > docker-compose.override.yml <<EOF
-services:
-  choreme:
-    environment:
-      - DB_TYPE=sqlite
-      - JWT_SECRET=$(openssl rand -base64 32)
-      - GIN_MODE=release
-    restart: unless-stopped
-    ports:
-      - "8080:8080"
-EOF
-
-docker-compose up -d choreme
-```
-
-**2. With PostgreSQL:**
-```bash
-docker-compose --profile postgres up -d
-```
-
-**3. With Reverse Proxy (SSL):**
-```bash
-# Edit Caddyfile with your domain
-echo "your-domain.com {
-    reverse_proxy choreme:8080
-}" > Caddyfile
-
-docker-compose --profile proxy up -d
-```
-
-#### Linux Logging Configuration
-
-**Systemd Journal (Default):**
-```bash
-# View real-time logs
-sudo journalctl -u choreme -f
-
-# View logs with timestamps
-sudo journalctl -u choreme --since "1 hour ago"
-
-# Export logs to file
-sudo journalctl -u choreme --since "today" > choreme-logs.txt
-```
-
-**File-based Logging:**
-```bash
-# Create log directory
-sudo mkdir -p /var/log/choreme
-sudo chown choreme:choreme /var/log/choreme
-
-# Update .env
-echo "LOG_FILE=/var/log/choreme/choreme.log" | sudo tee -a /opt/choreme/.env
-
-# Set up log rotation
-sudo tee /etc/logrotate.d/choreme > /dev/null <<EOF
-/var/log/choreme/*.log {
-    daily
-    rotate 30
-    compress
-    delaycompress
-    missingok
-    notifempty
-    create 644 choreme choreme
-    postrotate
-        systemctl reload choreme
-    endscript
-}
-EOF
-```
-
-### Windows Deployment
-
-#### Method 1: Windows Service (Recommended)
-
-**1. Build and Install:**
-```cmd
-REM Create application directory
-mkdir C:\Program Files\ChoreMe
-cd /d "C:\Program Files\ChoreMe"
-
-REM Download and extract (or build locally)
-git clone https://github.com/your-org/choreme.git temp
-cd temp
-go build -o choreme.exe cmd/choreme/main.go
-copy choreme.exe "C:\Program Files\ChoreMe\"
-xcopy migrations "C:\Program Files\ChoreMe\migrations\" /E /I
-cd ..
-rmdir temp /s /q
-```
-
-**2. Configure Environment:**
-```cmd
-REM Create data directory
-mkdir C:\ProgramData\ChoreMe
-mkdir C:\ProgramData\ChoreMe\logs
-
-REM Create .env file
-echo DB_TYPE=sqlite > "C:\Program Files\ChoreMe\.env"
-echo DB_NAME=C:\ProgramData\ChoreMe\choreme.db >> "C:\Program Files\ChoreMe\.env"
-echo JWT_SECRET=your-secure-random-key-change-this >> "C:\Program Files\ChoreMe\.env"
-echo HOST=0.0.0.0 >> "C:\Program Files\ChoreMe\.env"
-echo PORT=8080 >> "C:\Program Files\ChoreMe\.env"
-echo GIN_MODE=release >> "C:\Program Files\ChoreMe\.env"
-echo LOG_FILE=C:\ProgramData\ChoreMe\logs\choreme.log >> "C:\Program Files\ChoreMe\.env"
-```
-
-**3. Install as Windows Service using NSSM:**
-```cmd
-REM Download NSSM from https://nssm.cc/download
-REM Extract to C:\nssm
-
-REM Install service (run as Administrator)
-C:\nssm\nssm.exe install ChoreMe "C:\Program Files\ChoreMe\choreme.exe"
-C:\nssm\nssm.exe set ChoreMe AppDirectory "C:\Program Files\ChoreMe"
-C:\nssm\nssm.exe set ChoreMe DisplayName "ChoreMe Family Chore Management"
-C:\nssm\nssm.exe set ChoreMe Description "Family chore management system with mobile PWA"
-C:\nssm\nssm.exe set ChoreMe Start SERVICE_AUTO_START
-
-REM Configure logging
-C:\nssm\nssm.exe set ChoreMe AppStdout C:\ProgramData\ChoreMe\logs\choreme-out.log
-C:\nssm\nssm.exe set ChoreMe AppStderr C:\ProgramData\ChoreMe\logs\choreme-err.log
-
-REM Start service
-C:\nssm\nssm.exe start ChoreMe
-
-REM Check status
-sc query ChoreMe
-```
-
-**4. Firewall Configuration:**
-```cmd
-REM Allow through Windows Firewall (run as Administrator)
-netsh advfirewall firewall add rule name="ChoreMe" dir=in action=allow protocol=TCP localport=8080 profile=any
-```
-
-#### Method 2: PowerShell Deployment Script
-
-Create a deployment script `deploy-windows.ps1`:
-
-```powershell
-# Check if running as Administrator
-if (-NOT ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator"))
-{
-    Write-Error "This script requires Administrator privileges"
-    exit 1
-}
-
-# Configuration
-$AppDir = "C:\Program Files\ChoreMe"
-$DataDir = "C:\ProgramData\ChoreMe"
-$ServiceName = "ChoreMe"
-
-# Create directories
-New-Item -ItemType Directory -Path $AppDir -Force
-New-Item -ItemType Directory -Path "$DataDir\logs" -Force
-
-# Build application
-go build -o "$AppDir\choreme.exe" cmd/choreme/main.go
-
-# Copy migrations
-Copy-Item -Path "migrations" -Destination $AppDir -Recurse -Force
-
-# Generate secure JWT secret
-$JWTSecret = [System.Web.Security.Membership]::GeneratePassword(32, 0)
-
-# Create .env file
-@"
-DB_TYPE=sqlite
-DB_NAME=$DataDir\choreme.db
-JWT_SECRET=$JWTSecret
-HOST=0.0.0.0
-PORT=8080
-GIN_MODE=release
-LOG_FILE=$DataDir\logs\choreme.log
-"@ | Out-File -FilePath "$AppDir\.env" -Encoding UTF8
-
-Write-Output "ChoreMe deployed to $AppDir"
-Write-Output "Data directory: $DataDir"
-Write-Output "Configure as Windows Service using NSSM or sc.exe"
-```
-
-Run the deployment:
-```powershell
-# Run as Administrator
-Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
-.\deploy-windows.ps1
-```
-
-#### Windows Logging Configuration
-
-**Method 1: File-based Logging (Configured Above)**
-```cmd
-REM View logs
-type "C:\ProgramData\ChoreMe\logs\choreme.log"
-
-REM Monitor logs in real-time (PowerShell)
-Get-Content "C:\ProgramData\ChoreMe\logs\choreme.log" -Wait -Tail 20
-
-REM Search for errors
-findstr "ERROR" "C:\ProgramData\ChoreMe\logs\choreme.log"
-```
-
-**Method 2: Windows Event Log Integration**
-```cmd
-REM Create event log source (run as Administrator once)
-eventcreate /ID 1000 /L APPLICATION /T INFORMATION /SO "ChoreMe" /D "ChoreMe service initialized"
-
-REM Configure ChoreMe to use Event Log (add to .env)
-echo LOG_OUTPUT=eventlog >> "C:\Program Files\ChoreMe\.env"
-
-REM View events in Event Viewer
-eventvwr.msc
-REM Navigate to Windows Logs > Application > Filter by Source: ChoreMe
-```
-
-**Method 3: PowerShell Monitoring Script**
-```powershell
-# Create monitoring script: monitor-choreme.ps1
-param(
-    [string]$LogFile = "C:\ProgramData\ChoreMe\logs\choreme.log",
-    [int]$TailLines = 50
-)
-
-Write-Host "Monitoring ChoreMe logs at: $LogFile" -ForegroundColor Green
-Write-Host "Press Ctrl+C to exit" -ForegroundColor Yellow
-Write-Host ""
-
-if (Test-Path $LogFile) {
-    Get-Content $LogFile -Wait -Tail $TailLines | ForEach-Object {
-        $timestamp = Get-Date -Format "HH:mm:ss"
-        
-        if ($_ -match "ERROR|FATAL") {
-            Write-Host "[$timestamp] $_" -ForegroundColor Red
-        } elseif ($_ -match "WARN") {
-            Write-Host "[$timestamp] $_" -ForegroundColor Yellow
-        } elseif ($_ -match "INFO") {
-            Write-Host "[$timestamp] $_" -ForegroundColor Green
-        } else {
-            Write-Host "[$timestamp] $_"
-        }
-    }
-} else {
-    Write-Error "Log file not found: $LogFile"
-}
-```
-
-Run monitoring:
-```powershell
-.\monitor-choreme.ps1
-```
-
-### Cross-Platform Logging Best Practices
-
-#### Log Levels and Format
-Configure in `.env`:
-```env
-# Logging configuration
-LOG_LEVEL=info              # debug, info, warn, error
-LOG_FORMAT=json             # json, text
-LOG_FILE=/path/to/choreme.log   # File path or empty for stdout
-MAX_LOG_SIZE=100MB          # Rotate when file exceeds size
-LOG_RETENTION_DAYS=30       # Keep logs for 30 days
-```
-
-#### Monitoring Scripts
-
-**Linux Log Analysis:**
-```bash
-#!/bin/bash
-# analyze-logs.sh
-LOG_FILE="/var/log/choreme/choreme.log"
-
-echo "=== ChoreMe Log Analysis ==="
-echo "Total lines: $(wc -l < $LOG_FILE)"
-echo "Error count: $(grep -c "ERROR" $LOG_FILE)"
-echo "Warning count: $(grep -c "WARN" $LOG_FILE)"
-echo ""
-echo "Latest errors:"
-grep "ERROR" $LOG_FILE | tail -5
-```
-
-**Windows Log Analysis (PowerShell):**
-```powershell
-# analyze-logs.ps1
-$LogFile = "C:\ProgramData\ChoreMe\logs\choreme.log"
-$Content = Get-Content $LogFile
-
-Write-Host "=== ChoreMe Log Analysis ===" -ForegroundColor Cyan
-Write-Host "Total lines: $($Content.Length)"
-Write-Host "Error count: $(($Content | Select-String "ERROR").Count)"
-Write-Host "Warning count: $(($Content | Select-String "WARN").Count)"
-Write-Host ""
-Write-Host "Latest errors:" -ForegroundColor Red
-$Content | Select-String "ERROR" | Select-Object -Last 5
-```
-
-This comprehensive deployment guide covers both Linux and Windows deployment with proper logging configuration for production use.
-
-### Additional Docker Options
-
-#### Quick Docker Deployment (Alternative)
-```bash
-# SQLite (simplest)
-docker-compose up choreme
-
-# PostgreSQL 
-docker-compose --profile postgres up choreme-postgres postgres
-
-# MySQL/MariaDB
-docker-compose --profile mysql up choreme-mysql mysql
-
-# With reverse proxy (SSL)
-docker-compose --profile proxy up choreme caddy
-```
-
-## UI Options
-
-ChoreMe provides three UI options depending on your setup:
-
-### Option 1: Full React PWA (Recommended)
-- **Complete mobile app experience** with offline support
-- **Camera integration** for chore proof photos  
-- **Push notifications** and installable on mobile devices
-- **Requires**: Node.js 18+ to build the React frontend
-
-### Option 2: Simple HTML UI (Go-only)  
-- **Basic web interface** with essential functionality
-- **No Node.js required** - uses embedded HTML templates
-- **Good for**: Testing, simple deployments, server environments
-
-### Option 3: API-only Mode
-- **Backend API only** with JSON responses
-- **Perfect for**: Custom frontends, mobile apps, integrations
-- **Access**: API documentation at `/api` endpoint
-
-The system automatically detects which UI to serve based on what's available.
-
-## 🔧 Dependency Troubleshooting
-
-### **Common Issues & Solutions**
-
-#### **Go Module Issues**
-```bash
-# Issue: "go: module not found" or version conflicts  
-# Solution: Clean and refresh modules
-go clean -modcache
-go mod tidy
-go mod download
-
-# Issue: Build fails with "toolchain not available"
-# Solution: Update Go version or use compatible version
-go get go@1.22
-```
-
-#### **npm/Node.js Issues**  
-```bash
-# Issue: "npm ERR! code ENOTEMPTY" or package conflicts
-# Solution: Clean npm cache and reinstall
-rm -rf node_modules package-lock.json
-npm cache clean --force
-npm install
-
-# Issue: TypeScript compilation errors
-# Solution: Verify compatible TypeScript version
-npm ls typescript  # Should show 4.9.x
-```
-
-#### **Docker Issues**
-```bash
-# Issue: "docker: command not found"
-# Solution: Install Docker
-curl -fsSL https://get.docker.com | sh
-sudo systemctl start docker
-
-# Issue: Permission denied
-# Solution: Add user to docker group  
-sudo usermod -aG docker $USER
-newgrp docker
-```
-
-#### **Database Connection Issues**
-```bash
-# SQLite: Permission denied
-sudo chown $(whoami) /path/to/database/directory
-chmod 755 /path/to/database/directory
-
-# PostgreSQL: Connection refused
-sudo systemctl status postgresql
-sudo systemctl start postgresql
-
-# MySQL: Access denied  
-mysql -u root -p  # Test connection
-GRANT ALL PRIVILEGES ON choreme.* TO 'choreme'@'localhost';
-```
-
-### **Version Compatibility Matrix**
-
-| Go Version | Node.js | React | TypeScript | Status |
-|------------|---------|-------|------------|--------|
-| 1.22.8 | 20.x | 18.2.0 | 4.9.5 | ✅ Recommended |
-| 1.22.0 | 18.x | 18.2.0 | 4.9.5 | ✅ Supported |
-| 1.21.x | 18.x | 18.2.0 | 4.9.5 | ⚠️ Legacy |
-| 1.20.x | 16.x | 18.0.0 | 4.8.x | ❌ Unsupported |
-
-### **Performance Optimization**
-
-#### **Go Backend Optimization**
-```bash
-# Enable Go build optimizations
-export CGO_ENABLED=1
-export GOOS=linux  
-export GOARCH=amd64
-go build -ldflags="-s -w" -o choreme cmd/choreme/main.go
-
-# Database connection pooling (add to .env)
-echo "DB_MAX_OPEN_CONNS=25" >> .env
-echo "DB_MAX_IDLE_CONNS=10" >> .env
-echo "DB_CONN_MAX_LIFETIME=5m" >> .env
-```
-
-#### **React Frontend Optimization**
-```bash
-# Production build with optimizations
-export GENERATE_SOURCEMAP=false
-export INLINE_RUNTIME_CHUNK=false  
-npm run build
-
-# Bundle analysis
-npm install -g webpack-bundle-analyzer
-npx webpack-bundle-analyzer build/static/js/*.js
-```
-
-#### **Docker Optimization**
-```dockerfile
-# Multi-stage build for smaller images
-# Already configured in provided Dockerfile
-# Results in ~50MB final image vs ~800MB+ without optimization
-```
-
-### **Security Hardening Dependencies**
-
-#### **SSL/TLS Setup** 
-```bash
-# Let's Encrypt with Caddy (automatic)
-# Already configured in docker-compose.yml with Caddy profile
-
-# Manual SSL with nginx
-sudo apt install nginx certbot python3-certbot-nginx
-sudo certbot --nginx -d your-domain.com
-```
-
-#### **Firewall Configuration**
-```bash  
-# Ubuntu/Debian firewall setup
-sudo ufw enable
-sudo ufw allow 22    # SSH
-sudo ufw allow 80    # HTTP
-sudo ufw allow 443   # HTTPS
-sudo ufw deny 8080   # Block direct API access (use reverse proxy)
-```
-
-#### **Environment Security**
-```bash
-# Generate secure JWT secret
-export JWT_SECRET=$(openssl rand -base64 32)
-
-# Secure file permissions
-chmod 600 .env
-chmod 700 logs/
-chmod 755 choreme
-```
-
-### **Monitoring & Health Checks**
-
-#### **Application Health**
-```bash
-# Built-in health endpoint
-curl -f http://localhost:8080/health || echo "Service down"
-
-# Database health check
-# PostgreSQL: pg_isready -U choreme
-# MySQL: mysqladmin ping -u choreme -p
-# SQLite: ls -la /path/to/database.db
-```
-
-#### **Resource Monitoring**
-```bash
-# System resources
-htop                              # CPU, Memory, Processes
-df -h                            # Disk usage  
-netstat -tlnp | grep :8080      # Port usage
-
-# Application metrics
-curl http://localhost:8080/health | jq   # JSON health status
-journalctl -u choreme --since "1 hour ago"  # Application logs
-```
-
-#### **Log Analysis** 
-```bash
-# Error analysis
-grep -i "error\|fatal\|panic" logs/choreme.log | tail -10
-
-# Performance analysis  
-grep -i "slow\|timeout\|latency" logs/choreme.log
-
-# Request analysis
-grep "GET\|POST\|PUT\|DELETE" logs/choreme.log | tail -20
-```
-
-## Database Configuration
-
-### SQLite (Default)
-```env
-DB_TYPE=sqlite
-DB_NAME=choreme.db
-```
-
-### PostgreSQL
-```env
-DB_TYPE=postgres
-DB_HOST=localhost
-DB_PORT=5432
-DB_NAME=choreme
-DB_USER=choreme
-DB_PASS=password
-DB_SSL_MODE=disable
-```
-
-### MySQL/MariaDB
-```env
-DB_TYPE=mysql
-DB_HOST=localhost
-DB_PORT=3306
-DB_NAME=choreme
-DB_USER=choreme
-DB_PASS=password
-```
-
-## API Documentation
-
-### Authentication Endpoints
-
-#### Register First User (System Admin)
-```http
-POST /api/v1/auth/register
-Content-Type: application/json
-
-{
-    "household_name": "The Johnsons",
-    "name": "Alice Johnson",
-    "email": "alice@example.com",
-    "password": "securepassword"
-}
-```
-
-#### Login
-```http
-POST /api/v1/auth/login
-Content-Type: application/json
-
-{
-    "email": "alice@example.com",
-    "password": "securepassword"
-}
-```
-
-#### Join Household
-```http
-POST /api/v1/households/join
-Content-Type: application/json
-
-{
-    "invite_code": "abc12345",
-    "name": "Bob Johnson",
-    "email": "bob@example.com",
-    "password": "securepassword"
-}
-```
-
-### Protected Endpoints
-
-All protected endpoints require the `Authorization: Bearer <token>` header.
-
-#### Generate Invite Code
-```http
-POST /api/v1/households/invite
-Authorization: Bearer <admin_token>
-```
-
-#### Create Chore
-```http
-POST /api/v1/chores
-Authorization: Bearer <admin_token>
-Content-Type: application/json
-
-{
-    "title": "Do the dishes",
-    "description": "Wash and dry all dishes",
-    "value": "2.50",
-    "due_date": "2024-12-31T18:00:00Z",
-    "frequency": "daily",
-    "category": "Kitchen",
-    "priority": "medium",
-    "auto_approve": false,
-    "proof_required": true,
-    "late_penalty_pct": "10.00",
-    "expire_days": 3,
-    "assigned_to": [2, 3]
-}
-```
-
-#### Complete Chore
-```http
-PATCH /api/v1/assignments/{id}/complete
-Authorization: Bearer <worker_token>
-Content-Type: application/json
-
-{
-    "percent_complete": "100.00",
-    "proof_image": "base64_encoded_image_data"
-}
-```
-
-#### Approve Chore
-```http
-PATCH /api/v1/assignments/{id}/approve
-Authorization: Bearer <admin_token>
-Content-Type: application/json
-
-{
-    "approval_notes": "Great job!"
-}
-```
-
-## Architecture
-
-ChoreMe follows a **modern three-layer architecture** with a mobile-first PWA frontend and a multi-database backend API.
-
-### System Overview
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    ChoreMe System                           │
-├─────────────────────────────────────────────────────────────┤
-│  📱 PWA Frontend (React + TypeScript)                      │
-│  • Mobile-first responsive UI                              │
-│  • Offline-capable with service workers                    │
-│  • IndexedDB for local storage                             │
-│  • Camera integration & push notifications                 │
-├─────────────────────────────────────────────────────────────┤
-│  🔗 REST API Layer (Go + Gin)                             │
-│  • JWT authentication & role-based access                  │
-│  • 29+ endpoints with comprehensive functionality          │
-│  • CORS middleware & request validation                    │
-│  • Audit logging & error handling                          │
-├─────────────────────────────────────────────────────────────┤
-│  💾 Database Layer (Multi-backend)                        │
-│  • SQLite (embedded) / MySQL / PostgreSQL                  │
-│  • Database abstraction with factory pattern               │
-│  • Automatic migrations & connection pooling               │
-│  • Decimal precision for monetary values                   │
-└─────────────────────────────────────────────────────────────┘
-```
-
-### Project Structure
-```
-choreme/
-├── cmd/                    # Application entry points
-│   ├── choreme/           # Main API server
-│   └── migrate/           # Database migration tool
-├── internal/              # Backend Go code
-│   ├── api/              # HTTP handlers & routing
-│   ├── auth/             # JWT & password management
-│   ├── config/           # Configuration management
-│   ├── middleware/       # HTTP middleware (CORS, auth, logging)
-│   ├── model/            # Domain models & types
-│   ├── service/          # Business logic layer
-│   └── store/            # Database abstraction layer
-│       ├── interface.go  # Store interface definition
-│       ├── factory.go    # Database factory pattern
-│       ├── postgres/     # PostgreSQL implementation
-│       ├── mysql/        # MySQL/MariaDB implementation
-│       └── sqlite/       # SQLite implementation
-├── migrations/            # Database migration files
-│   ├── postgres/         # PostgreSQL-specific migrations
-│   ├── mysql/           # MySQL-specific migrations
-│   └── sqlite/          # SQLite-specific migrations
-├── web/                   # PWA Frontend (React)
-│   ├── public/           # Static assets & PWA manifest
-│   │   ├── manifest.json # PWA configuration
-│   │   ├── sw.js        # Service worker for offline support
-│   │   └── index.html   # App shell
-│   └── src/              # React TypeScript source
-│       ├── components/   # Reusable UI components
-│       ├── pages/       # Main application screens
-│       ├── hooks/       # Custom React hooks (useAuth, etc.)
-│       ├── services/    # API client & offline sync
-│       ├── types/       # TypeScript type definitions
-│       └── utils/       # Helper functions
-├── docker-compose.yml     # Multi-database deployment
-├── Dockerfile            # Container definition
-├── Makefile             # Development commands
-└── README.md            # This file
-```
-
-### Key Design Decisions
-
-- **Database Abstraction**: Single interface supporting multiple backends
-- **Decimal Precision**: Use `shopspring/decimal` for monetary values
-- **JWT Authentication**: Stateless authentication with role-based access
-- **Audit Logging**: Complete trail of all user actions
-- **Graceful Degradation**: Features work across all database types
-
-## Development
-
-### Available Commands
-
-```bash
-make build          # Build the application
-make run            # Run the application
-make test           # Run tests
-make migrate-up     # Run database migrations
-make migrate-down   # Rollback migrations
-make docker-build   # Build Docker image
-make docker-run     # Run with Docker Compose
-make dev-setup      # Setup development environment
-```
-
-### Adding New Endpoints
-
-1. Define the model in `internal/model/models.go`
-2. Add store interface method in `internal/store/interface.go`
-3. Implement in all database stores (`postgres/`, `mysql/`, `sqlite/`)
-4. Create service in `internal/service/`
-5. Add API handler in `internal/api/`
-6. Register route in `internal/api/server.go`
-
-### Database Migrations
-
-Create new migration files in the appropriate database directories:
-
-```bash
-# PostgreSQL
-migrations/postgres/002_new_feature.up.sql
-migrations/postgres/002_new_feature.down.sql
-
-# MySQL
-migrations/mysql/002_new_feature.up.sql
-migrations/mysql/002_new_feature.down.sql
-
-# SQLite
-migrations/sqlite/002_new_feature.up.sql
-migrations/sqlite/002_new_feature.down.sql
-```
-
-## Deployment
-
-### Complete System Deployment
-
-ChoreMe consists of two main components that work together:
-
-#### 1. Backend API Deployment
-
-**Database Choice**:
-- **SQLite**: Perfect for single families, embedded database, minimal setup
-- **MySQL/MariaDB**: Great for traditional web hosting, moderate scale
-- **PostgreSQL**: Best for high-concurrency, advanced features, large families
-
-**Security Configuration**:
-```env
-# Production .env example
-DB_TYPE=postgres
-JWT_SECRET=your-very-secure-random-key-change-this
-HOST=0.0.0.0
-PORT=8080
-GIN_MODE=release
-CORS_ORIGINS=https://your-pwa-domain.com
-```
-
-#### 2. PWA Frontend Deployment
-
-**Static Hosting Options**:
-- **Netlify** (Recommended) - Automatic HTTPS, easy deployment
-- **Vercel** - Excellent performance and CDN
-- **GitHub Pages** - Free for public repos
-- **AWS S3 + CloudFront** - Enterprise-scale hosting
-
-**PWA Deployment Steps**:
-```bash
-# Build production PWA
-cd web
-npm run build
-
-# Deploy to Netlify (example)
-# 1. Connect GitHub repo to Netlify
-# 2. Set build command: npm run build
-# 3. Set publish directory: web/build
-# 4. Add environment variable: REACT_APP_API_URL=https://your-api-domain.com/api/v1
-```
-
-**PWA Configuration**:
-```env
-# web/.env production
-REACT_APP_API_URL=https://your-api-domain.com/api/v1
-REACT_APP_VAPID_PUBLIC_KEY=your-push-notification-key
-```
-
-### Production Considerations
-
-#### Backend Security
-- Change default JWT secret to a secure random key
-- Use environment variables for all secrets
-- Enable HTTPS with SSL certificates (required for PWA)
-- Configure CORS with your PWA domain only
-- Set up database connection pooling
-- Enable audit logging and monitoring
-
-#### PWA Requirements
-- **HTTPS Required** - PWAs require secure origins for all features
-- **Service Worker** - Automatically configured for offline support
-- **Manifest** - App installation metadata included
-- **Icons** - Generate app icons for different platforms
-
-#### Performance Optimization
-- Backend: Connection pooling, image compression limits, caching headers
-- PWA: Code splitting, lazy loading, service worker caching
-- Database: Proper indexing, query optimization
-- CDN: Use CDN for PWA static assets
 
 ### Docker Production Deployment
 
-For complete system deployment with Docker:
-
 ```bash
-# Backend with PostgreSQL
+# Build and run with Docker Compose
 docker-compose --profile postgres up -d
 
-# Serve PWA (build first)
-cd web && npm run build
-docker run -p 3000:80 -v $(pwd)/build:/usr/share/nginx/html nginx
+# View logs
+docker-compose logs -f choreme
+
+# Stop services
+docker-compose down
 ```
 
-### Monitoring and Maintenance
+### Frontend Hosting Options
 
-**Health Checks**:
-- Backend: `GET /health` endpoint
-- PWA: Service worker status, offline capability
-- Database: Connection monitoring, query performance
+The Vue 3 frontend can be deployed separately for better scalability:
 
-**Backup Strategy**:
-- SQLite: File-based backup of .db file
-- PostgreSQL/MySQL: Regular database dumps
-- PWA: Static assets in version control
+**Option 1: Served by Go Backend**
+- Frontend built to `web/dist/`
+- Backend serves static files automatically
+- Simple deployment, single domain
 
-### Environment Variables
+**Option 2: Separate Static Hosting**
+- Deploy to Netlify, Vercel, AWS S3, or CDN
+- Configure `VITE_API_URL` to point to backend API
+- Better performance, CDN distribution
 
-See `.env.example` for all available configuration options.
+**Netlify Example:**
+```bash
+cd web
+npm run build
+
+# Deploy to Netlify (requires Netlify CLI)
+netlify deploy --prod --dir=dist
+```
+
+## Development
+
+### Running Tests
+```bash
+# Backend tests
+go test ./...
+
+# Frontend tests
+cd web
+npm run test
+```
+
+### Database Migrations
+
+#### Create Migration
+```bash
+# Create new migration files for all databases
+touch migrations/sqlite/003_feature_name.up.sql
+touch migrations/sqlite/003_feature_name.down.sql
+touch migrations/mysql/003_feature_name.up.sql
+touch migrations/mysql/003_feature_name.down.sql
+touch migrations/postgres/003_feature_name.up.sql
+touch migrations/postgres/003_feature_name.down.sql
+```
+
+#### Run Migrations
+```bash
+# Migrations run automatically on startup
+# Or manually:
+go run cmd/choreme/main.go --migrate
+```
+
+### Adding New Features
+
+1. **Backend**: Update models → store interface → implement for all DBs → service layer → API handlers
+2. **Frontend**: Add types → API client methods → Pinia store actions → Vue components
+3. **Migration**: Create migration files for all database types
+4. **Documentation**: Update API docs and README
+5. **Version**: Increment version in `VERSION` file
+
+## Monitoring and Maintenance
+
+### Health Checks
+```bash
+# API health
+curl http://localhost:8080/health
+
+# Database connection
+curl http://localhost:8080/api/v1/ping
+```
+
+### Logs
+```bash
+# Systemd logs
+sudo journalctl -u choreme -f
+
+# Docker logs
+docker-compose logs -f choreme
+```
+
+### Backup
+
+#### SQLite
+```bash
+# Stop service
+sudo systemctl stop choreme
+
+# Copy database file
+sudo cp /var/lib/choreme/choreme.db /backup/choreme-$(date +%Y%m%d).db
+
+# Start service
+sudo systemctl start choreme
+```
+
+#### PostgreSQL/MySQL
+```bash
+# PostgreSQL backup
+pg_dump -U choreme choreme > backup-$(date +%Y%m%d).sql
+
+# MySQL backup
+mysqldump -u choreme -p choreme > backup-$(date +%Y%m%d).sql
+```
+
+## Troubleshooting
+
+### Common Issues
+
+**Backend won't start:**
+```bash
+# Check logs
+sudo journalctl -u choreme -n 50
+
+# Verify database permissions
+ls -la /var/lib/choreme/
+
+# Test database connection
+go run cmd/choreme/main.go --test-db
+```
+
+**Frontend build fails:**
+```bash
+# Clear cache and reinstall
+rm -rf node_modules package-lock.json
+npm cache clean --force
+npm install
+```
+
+**API 401 Unauthorized:**
+- Check JWT_SECRET is set in backend .env
+- Verify token is being sent in Authorization header
+- Check token hasn't expired (default: 24 hours)
+
+**Database migration errors:**
+- Check migrations ran: Look for success message in logs
+- Manually check schema: Use sqlite3, psql, or mysql client
+- Reset database: Delete DB file/schema and restart (development only!)
 
 ## Contributing
 
 1. Fork the repository
-2. Create a feature branch
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
 3. Make your changes
 4. Add tests if applicable
-5. Ensure all tests pass
-6. Submit a pull request
+5. Commit your changes (`git commit -m 'Add amazing feature'`)
+6. Push to the branch (`git push origin feature/amazing-feature`)
+7. Open a Pull Request
+
+## Version History
+
+See [CHANGELOG.md](./CHANGELOG.md) for detailed version history.
+
+- **2.0.0** (Current) - Complete rewrite with Vue 3 + Vuetify and enhanced account management
+- **1.0.0** (Legacy) - Original React implementation
+
+## Documentation
+
+- **[BACKEND_IMPLEMENTATION.md](./BACKEND_IMPLEMENTATION.md)** - Complete backend API documentation
+- **[DEVELOPMENT.md](./DEVELOPMENT.md)** - Development setup and patterns guide
+- **[DEPLOYMENT.md](./DEPLOYMENT.md)** - Production deployment instructions
+- **[API_REFERENCE.md](./API_REFERENCE.md)** - Complete API endpoint reference
+- **[CLAUDE.md](./CLAUDE.md)** - AI assistant context and project conventions
 
 ## License
 
@@ -1449,71 +831,9 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 For issues and questions:
 - Create an issue on GitHub
-- Check the documentation in `/docs`
-- Review the API specification
-
-## Current Status & Roadmap
-
-### ✅ Completed Features
-- ✅ **Multi-Database Backend** - SQLite, MySQL, PostgreSQL support with abstraction layer
-- ✅ **RESTful API** - 29+ endpoints with JWT authentication and role-based access
-- ✅ **Mobile PWA Frontend** - React + TypeScript with offline-first architecture
-- ✅ **Authentication System** - Login, registration, household management with invite codes
-- ✅ **Chore Management** - Assignment, progress tracking, photo proof, completion workflows
-- ✅ **Earnings System** - Decimal-precision ledger with transaction history
-- ✅ **Reward Store** - Creation, redemption, and approval system
-- ✅ **Offline Support** - Service workers, IndexedDB storage, background sync
-- ✅ **Push Notifications** - Web push with service worker integration
-- ✅ **Camera Integration** - Photo capture with automatic compression
-- ✅ **PWA Features** - Installable app with app-like experience
-- ✅ **Responsive Design** - Mobile-first UI that works on all screen sizes
-- ✅ **Real-time Updates** - Live chore status and earnings synchronization
-
-### 🚧 Future Enhancements
-- [ ] **Advanced Reporting** - Analytics dashboard for parents
-- [ ] **Email Notifications** - SMTP integration for external notifications  
-- [ ] **Recurring Chore Automation** - Smart scheduling and auto-assignment
-- [ ] **Multi-language Support** - Internationalization (i18n)
-- [ ] **API Rate Limiting** - Protection against abuse
-- [ ] **Backup/Restore** - Data export and import functionality
-- [ ] **Native Mobile Apps** - React Native iOS/Android apps
-- [ ] **Family Calendar Integration** - Sync with Google Calendar, iCal
-- [ ] **Gamification Features** - Badges, streaks, leaderboards
-- [ ] **Voice Commands** - Integration with smart home devices
-
-### 🎯 Production Ready
-ChoreMe is **production-ready** for families wanting a comprehensive chore management system with:
-- Complete mobile app experience (PWA)
-- Full backend API with multi-database support  
-- Offline functionality and data synchronization
-- Photo proof and earnings tracking
-- Secure authentication and role management
+- Check documentation files in the repository
+- Review API documentation at `/api/v1/docs`
 
 ---
 
-## 📋 Recent Updates
-
-### **Latest Dependency Updates (2024)**
-✅ **Go Backend**: Updated to latest stable versions (Go 1.22, Gin 1.10.0, JWT v5.2.1)  
-✅ **React Frontend**: Updated to React 18.2.0 with TypeScript 4.9.5 compatibility  
-✅ **Database Support**: Latest drivers (SQLite 1.14.24, MySQL 1.8.1, PostgreSQL 17)  
-✅ **Docker Infrastructure**: Updated to PostgreSQL 17, MySQL 9.1, Caddy 2.8.4  
-✅ **Security**: Latest crypto libraries and authentication mechanisms  
-✅ **Build System**: Resolved npm conflicts and optimized build process  
-✅ **Documentation**: Complete dependency list with troubleshooting guide  
-
-### **Verified Compatible Versions**
-- **Go**: 1.22+ with latest security patches
-- **Node.js**: 18.19.0+ with npm 9+  
-- **React**: 18.2.0 with stable ecosystem
-- **TypeScript**: 4.9.5 (CRA compatible)
-- **Docker**: All images updated to latest stable versions
-
-### **Build Status**
-- ✅ Go backend builds successfully with all updated dependencies
-- ✅ React PWA builds successfully with TypeScript support
-- ✅ Docker containers build and deploy correctly  
-- ✅ All three UI options (PWA, HTML, API-only) working
-- ✅ Cross-platform deployment tested (Windows, Linux, Docker)
-
-**Installation verified working on**: Ubuntu 22.04, Windows 11, macOS, Docker environments
+**Built with ❤️ for families who want to make chores fun and rewarding**
