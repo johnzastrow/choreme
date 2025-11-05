@@ -57,6 +57,100 @@ The app shall be called ChoreMe
 
 * Track points/money in decimal format.
 
+### **Account Management (Enhanced Savings Account Features)**
+
+ChoreMe includes robust account management features that transform the simple ledger into a full-featured savings account system for tracking family finances.
+
+#### **Running Balance Display**
+* Each ledger transaction displays the **running balance** after the transaction is applied
+* Transactions show:
+  * Transaction amount (positive for credits, negative for debits)
+  * Running balance after transaction
+  * Brief note/description (e.g., "Mom bought Tim a toy", "Deposit from birthday money")
+* Ledger is displayed in chronological order with most recent first option
+
+#### **Transaction Types**
+The system supports multiple transaction types:
+
+1. **Chore Earnings** (existing) - Money earned from completing assigned chores
+2. **Reward Redemptions** (existing) - Money spent on rewards from the reward store
+3. **Manual Deposits** - Admin/Manager adds money to worker's account
+   * Examples: Birthday money, allowance top-ups, gifts
+   * Requires description/note for audit trail
+4. **Manual Withdrawals** - Worker or Admin records spending
+   * Examples: Purchased snacks, bought toy, spent at store
+   * Requires description/note
+   * Worker can initiate withdrawal
+   * All withdrawals are logged immediately (no approval required)
+5. **Transfers** - Move money between worker accounts
+   * Worker initiates transfer request
+   * **Requires Admin/Manager approval** before completion
+   * Workers **cannot see other workers' balances** at any time
+   * Transfer shows in both accounts' ledgers with notes
+6. **Interest Accrual** - Automatic interest payments
+   * Calculated monthly on current balance
+   * Interest rate is configurable per user by Admin/Manager
+   * Default interest rate: 0% (disabled by default)
+   * Compounds monthly
+   * Automatically creates ledger entry on accrual date
+7. **Manual Adjustments** (existing, enhanced) - Admin/Manager adjusts balance with note
+
+#### **Spending Limits & Controls**
+Each worker can have spending limits to teach financial responsibility:
+
+* **Three limit types**: Daily, Weekly, and Monthly limits
+* **Per-worker configuration**: Each worker has their own limit settings
+* **Admin controls**: Admin/Manager can set, modify, or reset limits anytime
+* **Automatic reset**: Limits reset according to schedule (daily at midnight, weekly on Sunday, monthly on 1st)
+* **Limit enforcement**:
+  * When limit is reached:
+    * **Block further withdrawals/spending** until reset or admin override
+    * **Notify both worker and admin** via configured notification method
+  * When transaction would exceed limit:
+    * **Warn the worker** before completing transaction
+    * **Offer to truncate** transaction to remaining limit amount
+    * Worker can choose to cancel or accept truncated amount
+* **Admin override**: Admin can manually release/reset limits for special circumstances
+* **Tracking**: All limit events logged in audit trail
+
+#### **Account Statements & Reports**
+Generate comprehensive account statements with rich visualizations:
+
+* **Export Formats**: HTML (web view) and PDF (download)
+* **Date Range Selection**: User selects start and end dates for statement
+* **Content Includes**:
+  * Account summary (opening balance, closing balance, net change)
+  * Complete transaction history for date range
+  * **Charts and Graphs**:
+    * Balance over time (line chart)
+    * Income vs spending (bar chart)
+    * Transaction types breakdown (pie chart)
+    * Weekly/monthly trends
+  * **Summary Statistics**:
+    * Total deposits
+    * Total withdrawals
+    * Total chore earnings
+    * Total rewards redeemed
+    * Interest earned
+    * Average daily balance
+    * Highest/lowest balance in period
+    * Most common transaction types
+* **Access Control**:
+  * Workers can generate their own account statements
+  * Admin/Manager can generate statements for any worker
+  * PDF includes household and worker name, statement date, generation date
+
+#### **Multi-Account Support (Future Ready)**
+The system is designed to support multiple accounts per user in the future:
+
+* Current implementation: One account per user
+* Database schema supports account_id for future expansion
+* When implemented, will support:
+  * Checking account (spending money)
+  * Savings account (long-term savings)
+  * Goal-based accounts (save for specific items)
+  * Transfers between own accounts
+
 
 ### **Notifications**
 
@@ -103,15 +197,61 @@ The app is a mobile-first app, which can be usable on a PC. It will allow offlin
 
 ### **Frontend**
 
-* **React** or **Vue** (easy to make responsive for mobile)
-* **Tailwind CSS** (for quick, consistent styling)
-* Use **PWA** features so it can be “installed” like an app on phones
+* **Vue 3 + Vuetify** - Modern, reactive framework with rich Material Design components
+* Vuetify provides:
+  * Comprehensive UI component library (buttons, cards, dialogs, data tables, charts)
+  * Responsive grid system
+  * Built-in theming and customization
+  * Accessibility features
+  * Easy maintenance and active community
+* **PWA** features so it can be "installed" like an app on phones
+* **Offline support** with local storage and sync
 
 ### **Backend**
 
-* SQlite, MySQL or PostgreSQL database
-* OR **Supabase** (Postgres + auth + file storage — more SQL control)
+* **Go (Golang)** - Cross-platform, easy deployment, high performance
+  * Single binary deployment for Linux, Windows, macOS
+  * Built-in concurrency for background jobs
+  * Strong standard library
+* **Gin Framework** - Fast HTTP web framework for Go
+* **Database Support**: SQLite or MariaDB
+  * **SQLite** - Embedded, zero-configuration, single-file database (perfect for small deployments)
+  * **MariaDB** - Full-featured, scalable MySQL-compatible database (for larger deployments)
+  * **Convertible** - Built-in migration tool to switch between databases while preserving all data
+* **Decimal Precision** - Uses shopspring/decimal for accurate money calculations
 * Store chores in structured documents/rows with decimal fields
+
+### **Database Migration & Backup**
+
+#### **SQLite ↔ MariaDB Conversion**
+The system includes an automatic database conversion tool:
+
+* **Automatic Migration**: Built-in tool converts database from SQLite to MariaDB or vice versa
+* **Data Preservation**: All data, relationships, and constraints are preserved during migration
+* **Zero Downtime Goal**: Minimizes service interruption during conversion
+* **Validation**: Post-migration data integrity checks ensure successful conversion
+* **Use Cases**:
+  * Start with SQLite for simplicity, migrate to MariaDB as family grows
+  * Move from MariaDB back to SQLite for simpler deployment
+  * Test environment uses SQLite, production uses MariaDB
+
+#### **JSON Backup & Restore**
+Comprehensive backup system with multiple uses:
+
+* **Full System Backup**: Export entire database to structured JSON format
+* **User-Downloadable**: Workers and admins can download their own data backups
+* **Alternative Migration Path**: JSON can be used to migrate between databases
+  * Export from SQLite → JSON → Import to MariaDB
+  * Useful for database version upgrades or troubleshooting
+* **Backup Contents**:
+  * All households, users, chores, assignments, rewards
+  * Complete ledger history with all transactions
+  * Audit logs for accountability
+  * User preferences and settings
+* **Restore Capability**: Import JSON backup to populate a new or existing database
+* **Disaster Recovery**: Regular automated backups can be scheduled
+* **Data Portability**: Users can take their data with them
+* **Format**: Human-readable JSON with proper indentation for debugging
 
 **Database Example (Chores Table)**:
 

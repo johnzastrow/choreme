@@ -38,9 +38,13 @@ const (
 type LedgerType string
 
 const (
-	LedgerTypeEarn   LedgerType = "earn"
-	LedgerTypeSpend  LedgerType = "spend"
-	LedgerTypeAdjust LedgerType = "adjust"
+	LedgerTypeEarn     LedgerType = "earn"
+	LedgerTypeSpend    LedgerType = "spend"
+	LedgerTypeAdjust   LedgerType = "adjust"
+	LedgerTypeDeposit  LedgerType = "deposit"
+	LedgerTypeWithdraw LedgerType = "withdrawal"
+	LedgerTypeTransfer LedgerType = "transfer"
+	LedgerTypeInterest LedgerType = "interest"
 )
 
 type RedemptionStatus string
@@ -51,6 +55,24 @@ const (
 	RedemptionStatusRejected RedemptionStatus = "rejected"
 )
 
+type TransferStatus string
+
+const (
+	TransferStatusPending   TransferStatus = "pending"
+	TransferStatusApproved  TransferStatus = "approved"
+	TransferStatusRejected  TransferStatus = "rejected"
+	TransferStatusCancelled TransferStatus = "cancelled"
+)
+
+type AccountType string
+
+const (
+	AccountTypePrimary  AccountType = "primary"
+	AccountTypeSavings  AccountType = "savings"
+	AccountTypeChecking AccountType = "checking"
+	AccountTypeGoal     AccountType = "goal"
+)
+
 type Household struct {
 	ID         int       `json:"id" db:"id"`
 	Name       string    `json:"name" db:"name"`
@@ -59,16 +81,18 @@ type Household struct {
 }
 
 type User struct {
-	ID                     int       `json:"id" db:"id"`
-	HouseholdID           int       `json:"household_id" db:"household_id"`
-	Name                  string    `json:"name" db:"name"`
-	Email                 string    `json:"email" db:"email"`
-	PasswordHash          string    `json:"-" db:"password_hash"`
-	Role                  Role      `json:"role" db:"role"`
-	NotificationPrefEmail bool      `json:"notification_pref_email" db:"notification_pref_email"`
-	NotificationPrefPush  bool      `json:"notification_pref_push" db:"notification_pref_push"`
-	CreatedAt             time.Time `json:"created_at" db:"created_at"`
-	UpdatedAt             time.Time `json:"updated_at" db:"updated_at"`
+	ID                     int             `json:"id" db:"id"`
+	HouseholdID           int             `json:"household_id" db:"household_id"`
+	Name                  string          `json:"name" db:"name"`
+	Email                 string          `json:"email" db:"email"`
+	PasswordHash          string          `json:"-" db:"password_hash"`
+	Role                  Role            `json:"role" db:"role"`
+	NotificationPrefEmail bool            `json:"notification_pref_email" db:"notification_pref_email"`
+	NotificationPrefPush  bool            `json:"notification_pref_push" db:"notification_pref_push"`
+	InterestRateAnnual    decimal.Decimal `json:"interest_rate_annual" db:"interest_rate_annual"`
+	LastInterestDate      *time.Time      `json:"last_interest_date,omitempty" db:"last_interest_date"`
+	CreatedAt             time.Time       `json:"created_at" db:"created_at"`
+	UpdatedAt             time.Time       `json:"updated_at" db:"updated_at"`
 }
 
 type Chore struct {
@@ -140,11 +164,14 @@ type LedgerEntry struct {
 	ChoreAssignmentID  *int            `json:"chore_assignment_id,omitempty" db:"chore_assignment_id"`
 	RedemptionID       *int            `json:"redemption_id,omitempty" db:"redemption_id"`
 	CreatedAt          time.Time       `json:"created_at" db:"created_at"`
+	RunningBalance     decimal.Decimal `json:"running_balance" db:"running_balance"`
+	TransferRequestID  *int            `json:"transfer_request_id,omitempty" db:"transfer_request_id"`
 
 	// Joined fields
-	User       *User       `json:"user,omitempty"`
-	Assignment *Assignment `json:"assignment,omitempty"`
-	Redemption *Redemption `json:"redemption,omitempty"`
+	User            *User            `json:"user,omitempty"`
+	Assignment      *Assignment      `json:"assignment,omitempty"`
+	Redemption      *Redemption      `json:"redemption,omitempty"`
+	TransferRequest *TransferRequest `json:"transfer_request,omitempty"`
 }
 
 type AuditLog struct {
@@ -157,6 +184,61 @@ type AuditLog struct {
 
 	// Joined fields
 	User *User `json:"user,omitempty"`
+}
+
+type Account struct {
+	ID          int         `json:"id" db:"id"`
+	UserID      int         `json:"user_id" db:"user_id"`
+	AccountType AccountType `json:"account_type" db:"account_type"`
+	Name        string      `json:"name" db:"name"`
+	IsActive    bool        `json:"is_active" db:"is_active"`
+	CreatedAt   time.Time   `json:"created_at" db:"created_at"`
+	UpdatedAt   time.Time   `json:"updated_at" db:"updated_at"`
+
+	// Joined fields
+	User *User `json:"user,omitempty"`
+}
+
+type SpendingLimit struct {
+	ID             int             `json:"id" db:"id"`
+	UserID         int             `json:"user_id" db:"user_id"`
+	DailyLimit     *decimal.Decimal `json:"daily_limit,omitempty" db:"daily_limit"`
+	WeeklyLimit    *decimal.Decimal `json:"weekly_limit,omitempty" db:"weekly_limit"`
+	MonthlyLimit   *decimal.Decimal `json:"monthly_limit,omitempty" db:"monthly_limit"`
+	DailySpent     decimal.Decimal `json:"daily_spent" db:"daily_spent"`
+	WeeklySpent    decimal.Decimal `json:"weekly_spent" db:"weekly_spent"`
+	MonthlySpent   decimal.Decimal `json:"monthly_spent" db:"monthly_spent"`
+	DailyResetAt   time.Time       `json:"daily_reset_at" db:"daily_reset_at"`
+	WeeklyResetAt  time.Time       `json:"weekly_reset_at" db:"weekly_reset_at"`
+	MonthlyResetAt time.Time       `json:"monthly_reset_at" db:"monthly_reset_at"`
+	IsDailyBlocked   bool          `json:"is_daily_blocked" db:"is_daily_blocked"`
+	IsWeeklyBlocked  bool          `json:"is_weekly_blocked" db:"is_weekly_blocked"`
+	IsMonthlyBlocked bool          `json:"is_monthly_blocked" db:"is_monthly_blocked"`
+	CreatedAt      time.Time       `json:"created_at" db:"created_at"`
+	UpdatedAt      time.Time       `json:"updated_at" db:"updated_at"`
+
+	// Joined fields
+	User *User `json:"user,omitempty"`
+}
+
+type TransferRequest struct {
+	ID              int             `json:"id" db:"id"`
+	FromUserID      int             `json:"from_user_id" db:"from_user_id"`
+	ToUserID        int             `json:"to_user_id" db:"to_user_id"`
+	Amount          decimal.Decimal `json:"amount" db:"amount"`
+	Description     string          `json:"description" db:"description"`
+	Status          TransferStatus  `json:"status" db:"status"`
+	RequestedAt     time.Time       `json:"requested_at" db:"requested_at"`
+	ApprovedAt      *time.Time      `json:"approved_at,omitempty" db:"approved_at"`
+	ApprovedBy      *int            `json:"approved_by,omitempty" db:"approved_by"`
+	RejectionReason *string         `json:"rejection_reason,omitempty" db:"rejection_reason"`
+	CreatedAt       time.Time       `json:"created_at" db:"created_at"`
+	UpdatedAt       time.Time       `json:"updated_at" db:"updated_at"`
+
+	// Joined fields
+	FromUser     *User `json:"from_user,omitempty"`
+	ToUser       *User `json:"to_user,omitempty"`
+	ApprovedByUser *User `json:"approved_by_user,omitempty"`
 }
 
 // DTOs for API requests/responses
@@ -229,9 +311,60 @@ type LedgerAdjustmentRequest struct {
 	Description *string `json:"description" binding:"required"`
 }
 
+type DepositRequest struct {
+	UserID      int     `json:"user_id" binding:"required"`
+	Amount      string  `json:"amount" binding:"required"`
+	Description string  `json:"description" binding:"required"`
+}
+
+type WithdrawalRequest struct {
+	Amount      string  `json:"amount" binding:"required"`
+	Description string  `json:"description" binding:"required"`
+}
+
+type CreateTransferRequest struct {
+	ToUserID    int     `json:"to_user_id" binding:"required"`
+	Amount      string  `json:"amount" binding:"required"`
+	Description string  `json:"description" binding:"required"`
+}
+
+type ApproveTransferRequest struct {
+	Approved bool    `json:"approved" binding:"required"`
+	RejectionReason *string `json:"rejection_reason,omitempty"`
+}
+
+type SetInterestRateRequest struct {
+	UserID             int    `json:"user_id" binding:"required"`
+	InterestRateAnnual string `json:"interest_rate_annual" binding:"required"`
+}
+
+type SetSpendingLimitsRequest struct {
+	UserID       int     `json:"user_id" binding:"required"`
+	DailyLimit   *string `json:"daily_limit,omitempty"`
+	WeeklyLimit  *string `json:"weekly_limit,omitempty"`
+	MonthlyLimit *string `json:"monthly_limit,omitempty"`
+}
+
+type GenerateStatementRequest struct {
+	DateFrom string `json:"date_from" binding:"required"`
+	DateTo   string `json:"date_to" binding:"required"`
+	Format   string `json:"format" binding:"required,oneof=html pdf"`
+}
+
 type UserBalance struct {
 	UserID  int             `json:"user_id"`
 	Balance decimal.Decimal `json:"balance"`
+}
+
+type SpendingCheckResult struct {
+	Allowed            bool            `json:"allowed"`
+	Amount             decimal.Decimal `json:"amount"`
+	DailyRemaining     *decimal.Decimal `json:"daily_remaining,omitempty"`
+	WeeklyRemaining    *decimal.Decimal `json:"weekly_remaining,omitempty"`
+	MonthlyRemaining   *decimal.Decimal `json:"monthly_remaining,omitempty"`
+	LimitType          *string         `json:"limit_type,omitempty"` // "daily", "weekly", "monthly"
+	SuggestedAmount    *decimal.Decimal `json:"suggested_amount,omitempty"`
+	Message            string          `json:"message,omitempty"`
 }
 
 // Response helpers
