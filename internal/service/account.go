@@ -441,3 +441,8 @@ func (s *AccountService) AccrueInterest(ctx context.Context) error {
 func (s *AccountService) CheckSpendingLimit(ctx context.Context, userID int, amount decimal.Decimal) (*model.SpendingCheckResult, error) {
 	return s.store.CheckSpendingLimit(ctx, userID, amount)
 }
+
+// ResetAllSpendingLimits resets all spending limits based on schedule
+func (s *AccountService) ResetAllSpendingLimits(ctx context.Context) error {
+	return s.store.ResetSpendingLimits(ctx)
+}

@@ -6,6 +6,7 @@ import (
 	"github.com/choreme/choreme/internal/auth"
 	"github.com/choreme/choreme/internal/config"
 	"github.com/choreme/choreme/internal/middleware"
+	"github.com/choreme/choreme/internal/scheduler"
 	"github.com/choreme/choreme/internal/service"
 	"github.com/choreme/choreme/internal/store"
 	"github.com/choreme/choreme/internal/web"
@@ -17,18 +18,21 @@ type Server struct {
 	store      store.Store
 	jwtManager *auth.JWTManager
 	services   *service.Services
+	scheduler  *scheduler.Scheduler
 	router     *gin.Engine
 }
 
 func NewServer(cfg *config.Config, store store.Store) *Server {
 	jwtManager := auth.NewJWTManager(cfg.JWT.Secret)
 	services := service.New(store)
+	sched := scheduler.NewScheduler(services)
 
 	server := &Server{
 		config:     cfg,
 		store:      store,
 		jwtManager: jwtManager,
 		services:   services,
+		scheduler:  sched,
 	}
 
 	server.setupRoutes()
@@ -151,6 +155,10 @@ func (s *Server) setupRoutes() {
 
 				// Interest rates
 				accountRoutes.POST("/interest-rate", s.setInterestRate)
+
+				// Manual job triggers (system admin only)
+				accountRoutes.POST("/jobs/accrue-interest", s.manualAccrueInterest)
+				accountRoutes.POST("/jobs/reset-spending-limits", s.manualResetSpendingLimits)
 			}
 
 			// Audit logs
@@ -202,5 +210,16 @@ func (s *Server) setupWebUI() {
 }
 
 func (s *Server) Run(addr string) error {
+	// Start background job scheduler
+	s.scheduler.Start()
+
+	log.Printf("Starting server on %s", addr)
 	return s.router.Run(addr)
+}
+
+// Shutdown gracefully shuts down the server and stops background jobs
+func (s *Server) Shutdown() {
+	log.Println("Shutting down server...")
+	s.scheduler.Stop()
+	log.Println("Server shutdown complete")
 }

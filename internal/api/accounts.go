@@ -330,3 +330,39 @@ func (s *Server) setInterestRate(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"success": true, "message": "Interest rate set"})
 }
+
+// POST /api/v1/accounts/jobs/accrue-interest
+func (s *Server) manualAccrueInterest(c *gin.Context) {
+	userID := c.GetInt("user_id")
+	user, err := s.store.GetUserByID(c.Request.Context(), userID)
+	if err != nil || user.Role != model.RoleSystemAdmin {
+		c.JSON(http.StatusForbidden, gin.H{"error": "insufficient permissions - system admin only"})
+		return
+	}
+
+	err = s.scheduler.RunOnce("accrue_interest")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"success": true, "message": "Interest accrual job completed"})
+}
+
+// POST /api/v1/accounts/jobs/reset-spending-limits
+func (s *Server) manualResetSpendingLimits(c *gin.Context) {
+	userID := c.GetInt("user_id")
+	user, err := s.store.GetUserByID(c.Request.Context(), userID)
+	if err != nil || user.Role != model.RoleSystemAdmin {
+		c.JSON(http.StatusForbidden, gin.H{"error": "insufficient permissions - system admin only"})
+		return
+	}
+
+	err = s.scheduler.RunOnce("reset_spending_limits")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"success": true, "message": "Spending limits reset job completed"})
+}
