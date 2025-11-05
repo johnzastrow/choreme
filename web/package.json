@@ -1,53 +1,33 @@
 {
   "name": "choreme-web",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "type-check": "vue-tsc --noEmit"
+  },
   "dependencies": {
-    "@types/node": "^18.19.0",
-    "@types/react": "^18.2.45",
-    "@types/react-dom": "^18.2.18",
-    "lodash": "^4.17.21",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-router-dom": "^6.20.0",
-    "react-scripts": "5.0.1",
-    "typescript": "^4.9.5",
-    "web-vitals": "^3.5.0"
+    "vue": "^3.4.15",
+    "vue-router": "^4.2.5",
+    "pinia": "^2.1.7",
+    "vuetify": "^3.5.1",
+    "@mdi/font": "^7.4.47",
+    "axios": "^1.6.5",
+    "@vueuse/core": "^10.7.2",
+    "chart.js": "^4.4.1",
+    "vue-chartjs": "^5.3.0",
+    "date-fns": "^3.3.1"
   },
   "devDependencies": {
-    "@tailwindcss/forms": "^0.5.6",
-    "autoprefixer": "^10.4.16",
-    "postcss": "^8.4.33",
-    "tailwindcss": "^3.3.5"
-  },
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  },
-  "overrides": {
-    "nth-check": "^2.1.1",
-    "webpack-dev-server": "^4.15.1",
-    "svgo": "^3.0.2",
-    "resolve-url-loader": "^5.0.0"
+    "@vitejs/plugin-vue": "^5.0.3",
+    "@vue/tsconfig": "^0.5.1",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.11",
+    "vite-plugin-vuetify": "^2.0.1",
+    "vue-tsc": "^1.8.27",
+    "sass": "^1.70.0"
   }
 }
