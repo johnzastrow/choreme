@@ -130,6 +130,29 @@ func (s *Server) setupRoutes() {
 				ledgerRoutes.GET("/balance", s.getBalance)
 			}
 
+			// Account management
+			accountRoutes := protected.Group("/accounts")
+			{
+				// Deposits and withdrawals
+				accountRoutes.POST("/deposit", s.deposit)
+				accountRoutes.POST("/withdraw", s.withdraw)
+
+				// Transfers
+				accountRoutes.POST("/transfer", s.createTransfer)
+				accountRoutes.GET("/transfers", s.getTransfers)
+				accountRoutes.GET("/transfers/pending", s.getPendingTransfers)
+				accountRoutes.POST("/transfers/:id/approve", s.approveTransfer)
+
+				// Spending limits
+				accountRoutes.GET("/spending-limit/check", s.checkSpendingLimit)
+				accountRoutes.POST("/spending-limits", s.setSpendingLimits)
+				accountRoutes.GET("/spending-limits/:userID", s.getSpendingLimits)
+				accountRoutes.POST("/spending-limits/:userID/reset", s.resetSpendingLimits)
+
+				// Interest rates
+				accountRoutes.POST("/interest-rate", s.setInterestRate)
+			}
+
 			// Audit logs
 			auditRoutes := protected.Group("/audit")
 			{
