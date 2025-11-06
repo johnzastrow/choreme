@@ -1,7 +1,7 @@
 
 
 
-Got it — you want a family-friendly online app that lets you assign chores, track completion, and give points (or money) as decimals.
+Got it — you want a family-friendly mobile-first, online app that lets you assign chores, track completion, and give points (or money) as decimals.
 Let’s start by outlining the core design in **three layers**: **features**, **user experience**, and **technical approach**.
 
 ---
